@@ -1,3 +1,6 @@
+#example execs
+libpedsim/example0*
+
 #pdfs
 *.pdf
 
