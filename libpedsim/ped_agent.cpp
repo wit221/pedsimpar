@@ -10,13 +10,13 @@
 
 #include <cmath>
 #include <algorithm>
-#include <random>
+//#include <random>
 #include <iostream>
 
 using namespace std;
 
 
-default_random_engine generator;
+//default_random_engine generator;
 
 
 /// Default Constructor
@@ -40,8 +40,8 @@ Ped::Tagent::Tagent() {
 
     // assign random maximal speed in m/s
     // normal distribution (mean 1.2, std 0.2)
-    normal_distribution<double> distribution(1.2, 0.2);
-    vmax = distribution(generator);
+    //normal_distribution<double> distribution(1.2, 0.2);
+    vmax = 1.2; //distribution(generator);
 
     factorsocialforce = 2.1;
     factorobstacleforce = 1.0; // parameter based on plausible pedsim output, not real measurement!
