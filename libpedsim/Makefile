@@ -1,6 +1,5 @@
 CXX = g++
 CXXFLAGS = -g -O2 -fno-inline -std=c++0x
-
 all: libpedsim.so
 
 libpedsim.so: ped_obstacle.cpp ped_vector.cpp ped_waypoint.cpp ped_agent.cpp ped_scene.cpp ped_tree.cpp
@@ -13,24 +12,12 @@ libpedsim.so: ped_obstacle.cpp ped_vector.cpp ped_waypoint.cpp ped_agent.cpp ped
 	$(CXX) $(CXXFLAGS) -fPIC -c ped_agent.cpp -o ped_agent.o
 	$(CXX) $(CXXFLAGS) -shared -Wl,-soname,libpedsim.so -o libpedsim.so ped_obstacle.o ped_vector.o ped_waypoint.o ped_agent.o ped_scene.o ped_tree.o ped_outputwriter.o
 
-test_gtest: libpedsim.so
-	$(CXX) $(CXXFLAGS) -I./ -I/usr/include/gtest -pthread tests/test_main.cpp tests/unit/*.cpp tests/acceptance/*.cpp /usr/lib/libgtest.a -o test_all -L. -lpedsim
-
-test_mem: libpedsim.so examples
-	LD_LIBRARY_PATH=. valgrind --leak-check=full --error-exitcode=1 ./example01
-
-test: test_gtest test_mem
-	LD_LIBRARY_PATH=. ./test_all
-
 examples: libpedsim.so examples/example*.cpp
 	g++ examples/example01.cpp -o example01 -I. -lpedsim -L. -g -std=c++0x
 	g++ examples/example02.cpp -o example02 -I. -lpedsim -L. -g -std=c++0x
 	g++ examples/example03.cpp -o example03 -I. -lpedsim -L. -g -std=c++0x
 	g++ examples/example04.cpp -o example04 -I. -lpedsim -L. -g -std=c++0x
 	g++ examples/example05.cpp -o example05 -I. -lpedsim -L. -g -std=c++0x
-
-regress: libpedsim.so regress_src/regress.cpp
-	g++ regress_src/regress.cpp -o regress -I. -lpedsim -L. -g -std=c++0x
 
 doc: documentation/doxygen.conf
 	doxygen documentation/doxygen.conf

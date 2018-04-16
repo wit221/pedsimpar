@@ -1,5 +1,6 @@
 #example execs
 libpedsim/example0*
+libpedsimpar/example0*
 
 #pdfs
 *.pdf
@@ -40,6 +41,6 @@ libpedsim/example0*
 *.out
 *.app
 
-pedsim_out.txt
 ecosystem/
-libpedsim/regress
+regress/regress_seq
+regress/regress_par
