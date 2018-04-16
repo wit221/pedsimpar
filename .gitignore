@@ -42,3 +42,4 @@ libpedsim/example0*
 
 pedsim_out.txt
 ecosystem/
+libpedsim/regress
