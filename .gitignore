@@ -40,3 +40,5 @@ libpedsim/example0*
 *.out
 *.app
 
+pedsim_out.txt
+ecosystem/

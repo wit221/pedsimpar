@@ -1,6 +1,8 @@
 CXX = g++
 CXXFLAGS = -g -O2 -fno-inline -std=c++0x
 
+all: libpedsim.so
+
 libpedsim.so: ped_obstacle.cpp ped_vector.cpp ped_waypoint.cpp ped_agent.cpp ped_scene.cpp ped_tree.cpp
 	$(CXX) $(CXXFLAGS) -fPIC -c ped_vector.cpp -o ped_vector.o
 	$(CXX) $(CXXFLAGS) -fPIC -c ped_outputwriter.cpp -o ped_outputwriter.o
@@ -26,6 +28,9 @@ examples: libpedsim.so examples/example*.cpp
 	g++ examples/example03.cpp -o example03 -I. -lpedsim -L. -g -std=c++0x
 	g++ examples/example04.cpp -o example04 -I. -lpedsim -L. -g -std=c++0x
 	g++ examples/example05.cpp -o example05 -I. -lpedsim -L. -g -std=c++0x
+
+regress: libpedsim.so regress_src/regress.cpp
+	g++ regress_src/regress.cpp -o regress -I. -lpedsim -L. -g -std=c++0x
 
 doc: documentation/doxygen.conf
 	doxygen documentation/doxygen.conf
