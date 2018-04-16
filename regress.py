@@ -3,6 +3,9 @@
 import difflib
 import subprocess
 
+print("[.] making libraries")
+subprocess.check_output(["make"], cwd="./libpedsim")
+subprocess.check_output(["make"], cwd="./libpedsimpar")
 print("[.] making test executables")
 subprocess.check_output("g++ ./regress/regress.cpp -o regress/regress_seq -Ilibpedsim -lpedsim -Llibpedsim -g -std=c++0x", shell=True)
 subprocess.check_output("g++ ./regress/regress.cpp -o regress/regress_par -Ilibpedsimpar -lpedsimpar -Llibpedsimpar -g -std=c++0x", shell=True)
