@@ -1,6 +1,7 @@
 #example execs
 libpedsim/example0*
 libpedsimpar/example0*
+bench_cache/
 
 #pdfs
 *.pdf
@@ -46,3 +47,4 @@ regress/regress_seq
 regress/regress_par
 
 pedsim_out*.txt
+notes.txt
