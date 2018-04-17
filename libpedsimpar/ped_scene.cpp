@@ -169,7 +169,10 @@ void Ped::Tscene::moveAgents(double h) {
     timestep++;
 
     // first update forces
-    for (Tagent* agent : agents) agent->computeForces();
+    #pragma omp parallel for
+    for (auto agent = agents.begin(); agent < agents.end(); agent++) {
+        (*agent)->computeForces();
+    }
 
     // then move agents according to their forces
     for (Tagent* agent : agents) agent->move(h);
