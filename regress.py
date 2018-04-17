@@ -3,6 +3,16 @@
 import difflib
 import subprocess
 import time
+import argparse
+import sys
+
+parser = argparse.ArgumentParser(description='Process some integers.')
+parser.add_argument('-n', type=int, metavar="NUMAGENTS", nargs='?', default=100, help='Number of agents (0 < n <= 1000)')
+args = parser.parse_args()
+
+if args.n <= 0 or args.n > 1000:
+    print("[-] Invalid number of agents (0 < n <= 1000)")
+    sys.exit(0)
 
 print("[.] making libraries")
 subprocess.check_output(["make"], cwd="./libpedsim")
@@ -14,7 +24,7 @@ subprocess.check_output("g++ ./regress/regress.cpp -o regress/regress_par -Ilibp
 
 print("[.] running sequential")
 start = time.time()
-subprocess.check_output("LD_LIBRARY_PATH=./libpedsim/:${LD_LIBRARY_PATH} ./regress/regress_seq", shell=True)
+subprocess.check_output("LD_LIBRARY_PATH=./libpedsim/:${LD_LIBRARY_PATH} ./regress/regress_seq -n {}".format(args.n), shell=True)
 subprocess.check_output("mv ./pedsim_out.txt ./pedsim_out_seq.txt", shell=True)
 end = time.time()
 seqtime = end-start
@@ -22,7 +32,7 @@ print("Sequential: {} ms".format(seqtime*1000.0))
 
 print("[.] running parallel")
 start = time.time()
-subprocess.check_output("LD_LIBRARY_PATH=./libpedsimpar/:${LD_LIBRARY_PATH} ./regress/regress_par", shell=True)
+subprocess.check_output("LD_LIBRARY_PATH=./libpedsimpar/:${LD_LIBRARY_PATH} ./regress/regress_par -n {}".format(args.n), shell=True)
 subprocess.check_output("mv ./pedsim_out.txt ./pedsim_out_par.txt", shell=True)
 end = time.time()
 partime = end-start
