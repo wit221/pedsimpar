@@ -16,7 +16,7 @@
 
 using namespace std;
 
-void simulate(int numagents) {
+void simulate(int numagents, int maxtime) {
     // setup
     Ped::Tscene *pedscene = new Ped::Tscene(); // no quadtree
 
@@ -90,7 +90,7 @@ void simulate(int numagents) {
             if (a->reachedDestination())
                 notreached--;
         }
-        if (timestep >= 20000)
+        if (timestep >= maxtime)
             notreached = 0; // seems to run forever.
     }
 
@@ -114,14 +114,18 @@ void usage(char* argv0) {
 
 int main(int argc, char *argv[]) {
     int numagents = 100;
+    int maxtime = 20000;
     int c;
-    while ((c = getopt(argc, argv, "hn:")) != -1) {
+    while ((c = getopt(argc, argv, "hn:t:")) != -1) {
         switch(c) {
             case 'h':
                 usage(argv[0]);
                 break;
             case 'n':
                 numagents = atoi(optarg);
+                break;
+            case 't':
+                maxtime = atoi(optarg);
                 break;
             default:
                 break;
@@ -133,6 +137,6 @@ int main(int argc, char *argv[]) {
         exit(0);
     }
 
-    simulate(numagents);
+    simulate(numagents, maxtime);
     return EXIT_SUCCESS;
 }
