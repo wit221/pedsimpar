@@ -14,7 +14,7 @@ using namespace std;
 
 int main(int argc, char *argv[]) {
 
-    // create an output writer which will send output to a file 
+    // create an output writer which will send output to a file
     Ped::OutputWriter *ow = new Ped::FileOutputWriter();
     ow->setScenarioName("Example 01");
 
@@ -31,13 +31,13 @@ int main(int argc, char *argv[]) {
     Ped::Tobstacle *o = new Ped::Tobstacle(0, -50,  0, +50);
     pedscene->addObstacle(o);
 
-    for (int i = 0; i<10; i++) {
+    for (int i = 0; i<300; i++) {
         Ped::Tagent *a = new Ped::Tagent();
 
         a->addWaypoint(w1);
         a->addWaypoint(w2);
 
-        a->setPosition(-50 + rand()/(RAND_MAX/80)-40, 0 + rand()/(RAND_MAX/20) -10, 0);
+        a->setPosition(-50 + rand()/(RAND_MAX/80.0)-40, 0 + rand()/(RAND_MAX/20.0)-10, 0);
 
         pedscene->addAgent(a);
     }
@@ -45,7 +45,7 @@ int main(int argc, char *argv[]) {
     // Move all agents for 700 steps (and write their position through the outputwriter)
     for (int i=0; i<700; ++i) {
         pedscene->moveAgents(0.3);
-	std::this_thread::sleep_for(std::chrono::milliseconds(3));
+	//std::this_thread::sleep_for(std::chrono::milliseconds(3));
     }
 
     // Cleanup
