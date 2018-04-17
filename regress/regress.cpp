@@ -12,10 +12,11 @@
 
 #include <iostream>
 #include <sstream>
+#include <unistd.h>
 
 using namespace std;
 
-int main(int argc, char *argv[]) {
+void simulate(int numagents) {
     // setup
     Ped::Tscene *pedscene = new Ped::Tscene(); // no quadtree
 
@@ -53,7 +54,7 @@ int main(int argc, char *argv[]) {
     pedscene->addWaypoint(w2);
 
     // create agents
-    for (int i = 0; i < 200; i++) {
+    for (int i = 0; i < numagents; i++) {
         Ped::Tagent *a = new Ped::Tagent();
         a->setWaypointBehavior(Ped::Tagent::BEHAVIOR_ONCE); // only once
         a->setVmax(1.2); // same speed for all agents
@@ -104,6 +105,34 @@ int main(int argc, char *argv[]) {
         delete o;
     };
     delete pedscene;
+}
 
+void usage(char* argv0) {
+    cout << argv0 << " [-n numagents]" << endl;
+    exit(0);
+}
+
+int main(int argc, char *argv[]) {
+    int numagents = 100;
+    int c;
+    while ((c = getopt(argc, argv, "hn:")) != -1) {
+        switch(c) {
+            case 'h':
+                usage(argv[0]);
+                break;
+            case 'n':
+                numagents = atoi(optarg);
+                break;
+            default:
+                break;
+        }
+    }
+
+    if (numagents <= 0 || numagents > 1000) {
+        cout << "Invalid number of agents (0 < numagents <= 1000)" << endl;
+        exit(0);
+    }
+
+    simulate(numagents);
     return EXIT_SUCCESS;
 }

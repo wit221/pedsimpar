@@ -44,3 +44,5 @@ libpedsimpar/example0*
 ecosystem/
 regress/regress_seq
 regress/regress_par
+
+pedsim_out*.txt
