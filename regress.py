@@ -27,7 +27,7 @@ subprocess.check_output("mv ./pedsim_out.txt ./pedsim_out_par.txt", shell=True)
 end = time.time()
 partime = end-start
 print("Parallel:   {} ms".format(partime*1000.0))
-print("Speedup: {}".fomrat(seqtime/partime))
+print("Speedup: {}".format(seqtime/partime))
 
 print("[.] checking output")
 
