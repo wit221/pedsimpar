@@ -1,5 +1,5 @@
 CXX = g++
-CXXFLAGS = -g -O2 -fno-inline -std=c++0x -fopenmp
+CXXFLAGS = -g -O2 -fno-inline -std=c++0x -fopenmp -pg
 
 all: libpedsimpar.so
 
