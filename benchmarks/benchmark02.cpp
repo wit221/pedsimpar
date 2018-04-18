@@ -34,7 +34,7 @@ int main(int argc, char *argv[]) {
     Ped::Tobstacle *o = new Ped::Tobstacle(0, -50,  0, +50);
     pedscene->addObstacle(o);
 
-    int nagents = 1;
+    int nagents = 500;
 
     for (int i = 0; i<nagents; i++) {
         Ped::Tagent *a = new Tagent2();
@@ -42,19 +42,14 @@ int main(int argc, char *argv[]) {
         a->addWaypoint(w1);
         a->addWaypoint(w2);
 
-        a->setPosition(-50 + rand()/(RAND_MAX/80)-40, 0 + rand()/(RAND_MAX/20) -10, 0);
+        a->setPosition(-50 + rand()/(RAND_MAX/80.0)-40, 0 + rand()/(RAND_MAX/20.0) -10, 0);
 
         pedscene->addAgent(a);
     }
 
-    // move all agents for 10 steps (and print their position)
-    for (int i=0; i<10; ++i) {
+    // move all agents for 200 steps
+    for (int i=0; i<200; ++i) {
         pedscene->moveAgents(0.2);
-
-        const vector<Ped::Tagent*>& myagents = pedscene->getAllAgents();
-        for (vector<Ped::Tagent*>::const_iterator iter = myagents.begin(); iter != myagents.end(); ++iter) {
-	  cout << (*iter)->getPosition().x << "/" << (*iter)->getPosition().y << endl;
-        }
     }
 
     // cleanup

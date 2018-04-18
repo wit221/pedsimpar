@@ -8,22 +8,14 @@
 
 #include "ped_includes.h"
 
-#include "ped_outputwriter.h"
-
 using namespace std;
 
 int main(int argc, char *argv[]) {
-
-    // create an output writer which will send output to a file
-    Ped::OutputWriter *ow = new Ped::FileOutputWriter();
-    ow->setScenarioName("Example 01");
 
     cout << "PedSim Example using libpedsim version " << Ped::LIBPEDSIM_VERSION << endl;
 
     // Setup
     Ped::Tscene *pedscene = new Ped::Tscene(-200, -200, 400, 400);
-
-    pedscene->setOutputWriter(ow);
 
     Ped::Twaypoint *w1 = new Ped::Twaypoint(-100, 0, 24);
     Ped::Twaypoint *w2 = new Ped::Twaypoint(+100, 0, 12);
@@ -42,7 +34,7 @@ int main(int argc, char *argv[]) {
         pedscene->addAgent(a);
     }
 
-    // Move all agents for 700 steps (and write their position through the outputwriter)
+    // Move all agents for 700 steps
     for (int i=0; i<700; ++i) {
         pedscene->moveAgents(0.3);
 	//std::this_thread::sleep_for(std::chrono::milliseconds(3));
@@ -54,7 +46,6 @@ int main(int argc, char *argv[]) {
     delete w1;
     delete w2;
     delete o;
-    delete ow;
 
     return EXIT_SUCCESS;
 }
