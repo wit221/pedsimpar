@@ -51,6 +51,3 @@ if outputSeq != outputPar:
         print(line)
 else:
     print("[+] Passed.")
-
-subprocess.check_output(["rm", "./pedsim_out_seq.txt"])
-subprocess.check_output(["rm", "./pedsim_out_par.txt"])
