@@ -23,7 +23,7 @@ int main(int argc, char *argv[]) {
     Ped::Tobstacle *o = new Ped::Tobstacle(0, -50,  0, +50);
     pedscene->addObstacle(o);
 
-    for (int i = 0; i<300; i++) {
+    for (int i = 0; i<5000; i++) {
         Ped::Tagent *a = new Ped::Tagent();
 
         a->addWaypoint(w1);
@@ -34,8 +34,8 @@ int main(int argc, char *argv[]) {
         pedscene->addAgent(a);
     }
 
-    // Move all agents for 700 steps
-    for (int i=0; i<700; ++i) {
+    // Move all agents for 10 steps
+    for (int i=0; i<10; ++i) {
         pedscene->moveAgents(0.3);
 	//std::this_thread::sleep_for(std::chrono::milliseconds(3));
     }
