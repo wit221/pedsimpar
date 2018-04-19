@@ -20,7 +20,9 @@ using namespace std;
 /// Default constructor. If this constructor is used, there will be no quadtree created.
 /// This is faster for small scenarios or less than 1000 Tagents.
 /// \date    2012-01-17
-Ped::Tscene::Tscene() : tree(NULL), timestep(0) {};
+Ped::Tscene::Tscene() : tree(NULL), timestep(0) {
+    cerr << "no tree" << endl;
+};
 
 
 /// Constructor used to create a quadtree statial representation of the Tagents. Use this
@@ -34,6 +36,7 @@ Ped::Tscene::Tscene() : tree(NULL), timestep(0) {};
 /// \param width is the total width of the boundary. Basically from left to right.
 /// \param height is the total height of the boundary. Basically from top to down.
 Ped::Tscene::Tscene(double left, double top, double width, double height) : Tscene() {
+    cerr << "tree: " << left << " " << top << " " << width << " " << height << endl;
     tree = new Ped::Ttree(this, 0, left, top, width, height);
 }
 
@@ -175,7 +178,16 @@ void Ped::Tscene::moveAgents(double h) {
     }
 
     // then move agents according to their forces
-    for (Tagent* agent : agents) agent->move(h);
+    if (tree == NULL) {
+        #pragma omp parallel for
+        for (auto agent = agents.begin(); agent < agents.end(); agent++) {
+            (*agent)->move(h);
+        }
+    } else {
+        for (auto agent : agents) {
+            agent->move(h);
+        }
+    }
 
     // then output their new position if an OutputWriter is given.
 	for (auto ow : outputwriters) {

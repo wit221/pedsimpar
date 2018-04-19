@@ -25,6 +25,7 @@
 #endif
 
 #include <set>
+#include <omp.h>
 
 using namespace std;
 
@@ -77,6 +78,7 @@ namespace Ped {
         Ttree *tree2;
         Ttree *tree3;
         Ttree *tree4;
+        omp_lock_t lock;
 
         Ped::Tscene *scene;
 
