@@ -103,9 +103,8 @@ namespace Ped {
 
         void placeAgent(const Ped::Tagent *a);
         void moveAgent(const Ped::Tagent *a);
-        vector<const Ped::Tagent*> getNeighborVector(double x, double y, double dist) const;
         void getNeighbors(list<const Ped::Tagent*>& neighborList, double x, double y, double dist) const;
-
+ 
 	private:
 		vector<OutputWriter*> outputwriters;
 		map<const Ped::Tagent*, Ttree*> treehash;
