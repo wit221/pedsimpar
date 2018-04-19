@@ -20,9 +20,7 @@ using namespace std;
 /// Default constructor. If this constructor is used, there will be no quadtree created.
 /// This is faster for small scenarios or less than 1000 Tagents.
 /// \date    2012-01-17
-Ped::Tscene::Tscene() : tree(NULL), timestep(0) {
-    cerr << "no tree" << endl;
-};
+Ped::Tscene::Tscene() : tree(NULL), timestep(0) {};
 
 
 /// Constructor used to create a quadtree statial representation of the Tagents. Use this
@@ -240,6 +238,19 @@ set<const Ped::Tagent*> Ped::Tscene::getNeighbors(double x, double y, double dis
 
     // copy the neighbors to a set
     return set<const Ped::Tagent*>(neighborList.begin(), neighborList.end());
+}
+
+vector<const Ped::Tagent*> Ped::Tscene::getNeighborVector(double x, double y, double dist) const {
+    // if there is no tree, return all agents
+    if (tree == NULL)
+        return vector<const Ped::Tagent*>(agents.begin(), agents.end());
+
+    // create the output list
+    list<const Ped::Tagent*> neighborList;
+    getNeighbors(neighborList, x, y, dist);
+
+    // copy the neighbors to a vector
+    return vector<const Ped::Tagent*>(neighborList.begin(), neighborList.end());
 }
 
 void Ped::Tscene::getNeighbors(list<const Ped::Tagent*>& neighborList, double x, double y, double dist) const {
