@@ -16,9 +16,15 @@
 
 using namespace std;
 
-void simulate(int numagents, int maxtime) {
+void simulate(int numagents, int maxtime, bool quadtree) {
     // setup
-    Ped::Tscene *pedscene = new Ped::Tscene(); // no quadtree
+    Ped::Tscene *pedscene;
+
+    if (quadtree) {
+        pedscene = new Ped::Tscene(-200, -200, 400, 400);
+    } else {
+        pedscene = new Ped::Tscene(); // no quadtree
+    }
 
     // create an output writer which will send output to a visualizer
     Ped::OutputWriter *ow = new Ped::FileOutputWriter();
@@ -60,26 +66,19 @@ void simulate(int numagents, int maxtime) {
         a->setVmax(1.2); // same speed for all agents
         a->setfactorsocialforce(10.0);
         a->setfactorobstacleforce(2.0);
+        if (a->getid() % 2 == 0) {
+            a->setPosition(-80 - (a->getid() / 50), -25 + (a->getid() % 50), 0);
+            a->addWaypoint(w1);
+        } else {
+            a->setPosition(80 + (a->getid() / 50), -25 + (a->getid() % 50), 0);
+            a->addWaypoint(w2);
+        }
         pedscene->addAgent(a);
     }
 
-    // convenience
-    const vector<Ped::Tagent *> &myagents = pedscene->getAllAgents();
-    const vector<Ped::Tobstacle *> &myobstacles = pedscene->getAllObstacles();
-
     long int timestep = 0;
 
-    // reset agents
-    for (vector<Ped::Tagent *>::const_iterator it = myagents.begin();
-         it != myagents.end(); ++it) {
-        if ((*it)->getid() % 2 == 0) {
-            (*it)->setPosition(-80 - ((*it)->getid() / 50), -25 + ((*it)->getid() % 50), 0);
-            (*it)->addWaypoint(w1);
-        } else {
-            (*it)->setPosition(80 + ((*it)->getid() / 50), -25 + ((*it)->getid() % 50), 0);
-            (*it)->addWaypoint(w2);
-        }
-    }
+    auto myagents = pedscene->getAllAgents();
 
     int notreached = myagents.size();
     while (notreached > 0) {
@@ -116,13 +115,17 @@ int main(int argc, char *argv[]) {
     int numagents = 100;
     int maxtime = 20000;
     int c;
-    while ((c = getopt(argc, argv, "hn:t:")) != -1) {
+    bool quadtree = false;
+    while ((c = getopt(argc, argv, "hn:t:q")) != -1) {
         switch(c) {
             case 'h':
                 usage(argv[0]);
                 break;
             case 'n':
                 numagents = atoi(optarg);
+                break;
+            case 'q':
+                quadtree = true;
                 break;
             case 't':
                 maxtime = atoi(optarg);
@@ -137,6 +140,6 @@ int main(int argc, char *argv[]) {
         exit(0);
     }
 
-    simulate(numagents, maxtime);
+    simulate(numagents, maxtime, quadtree);
     return EXIT_SUCCESS;
 }
