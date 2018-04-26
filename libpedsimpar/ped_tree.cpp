@@ -99,6 +99,45 @@ void Ped::Ttree::addAgent(const Ped::Tagent *a) {
   omp_unset_nest_lock(const_cast<omp_nest_lock_t*>(&lock));
 }
 
+void Ped::Ttree::addAgentHelper(const Ped::Tagent *a, omp_nest_lock_t *parentlock) {
+  omp_set_nest_lock(const_cast<omp_nest_lock_t*>(&lock));
+  if (parentlock != NULL) {
+    omp_unset_nest_lock(const_cast<omp_nest_lock_t*>(parentlock));
+  }
+  #ifdef _OPENMP
+  //cerr << a->getid() << " " << omp_get_thread_num() << endl;
+  #endif
+  if (isleaf) {
+    agents.insert(a);
+    scene->treehash[a] = this;
+    if (agents.size() <= 8) {
+      omp_unset_nest_lock(const_cast<omp_nest_lock_t*>(&lock));
+      return;
+    }
+  }
+  else {
+    const Tvector pos = a->getPosition();
+    if ((pos.x >= x+w/2) && (pos.y >= y+h/2)) tree3->addAgentHelper(a, &lock); // 3
+    else if ((pos.x <= x+w/2) && (pos.y <= y+h/2)) tree1->addAgentHelper(a, &lock); // 1
+    else if ((pos.x >= x+w/2) && (pos.y <= y+h/2)) tree2->addAgentHelper(a, &lock); // 2
+    else if ((pos.x <= x+w/2) && (pos.y >= y+h/2)) tree4->addAgentHelper(a, &lock); // 4
+  }
+
+  if (agents.size() > 8) {
+    isleaf = false;
+    addChildren();
+    while (!agents.empty()) {
+      const Ped::Tagent *a = (*agents.begin());
+      const Tvector pos = a->getPosition();
+      agents.erase(a);
+      if ((pos.x >= x+w/2) && (pos.y >= y+h/2)) tree3->addAgentHelper(a, &lock); // 3
+      else if ((pos.x <= x+w/2) && (pos.y <= y+h/2)) tree1->addAgentHelper(a, &lock); // 1
+      else if ((pos.x >= x+w/2) && (pos.y <= y+h/2)) tree2->addAgentHelper(a, &lock); // 2
+      else if ((pos.x <= x+w/2) && (pos.y >= y+h/2)) tree4->addAgentHelper(a, &lock); // 4
+    }
+  }
+}
+
 
 /// A little helper that adds child nodes to this node
 /// \author  chgloor
