@@ -66,28 +66,17 @@ void Ped::Ttree::clear() {
 /// \date    2012-01-28
 /// \param   *a The agent to add
 void Ped::Ttree::addAgent(const Ped::Tagent *a) {
-  addAgentHelper(a, NULL);
-}
-
-void Ped::Ttree::addAgentHelper(const Ped::Tagent *a, omp_lock_t *parentlock) {
   omp_set_lock(const_cast<omp_lock_t*>(&lock));
-  if (parentlock != NULL) {
-    omp_unset_lock(const_cast<omp_lock_t*>(parentlock));
-  }
   if (isleaf) {
     agents.insert(a);
     scene->treehash[a] = this;
-    if (agents.size() <= 8) {
-      omp_unset_lock(const_cast<omp_lock_t*>(&lock));
-      return;
-    }
   }
   else {
     const Tvector pos = a->getPosition();
-    if ((pos.x <= x+w/2) && (pos.y <= y+h/2)) tree1->addAgentHelper(a, &lock); // 1
-    else if ((pos.x >= x+w/2) && (pos.y <= y+h/2)) tree2->addAgentHelper(a, &lock); // 2
-    else if ((pos.x >= x+w/2) && (pos.y >= y+h/2)) tree3->addAgentHelper(a, &lock); // 3
-    else if ((pos.x <= x+w/2) && (pos.y >= y+h/2)) tree4->addAgentHelper(a, &lock); // 4
+    if ((pos.x >= x+w/2) && (pos.y >= y+h/2)) tree3->addAgent(a); // 3
+    if ((pos.x <= x+w/2) && (pos.y <= y+h/2)) tree1->addAgent(a); // 1
+    if ((pos.x >= x+w/2) && (pos.y <= y+h/2)) tree2->addAgent(a); // 2
+    if ((pos.x <= x+w/2) && (pos.y >= y+h/2)) tree4->addAgent(a); // 4
   }
   
   if (agents.size() > 8) {
@@ -96,13 +85,14 @@ void Ped::Ttree::addAgentHelper(const Ped::Tagent *a, omp_lock_t *parentlock) {
     while (!agents.empty()) {
       const Ped::Tagent *a = (*agents.begin());
       const Tvector pos = a->getPosition();
-      if ((pos.x <= x+w/2) && (pos.y <= y+h/2)) tree1->addAgentHelper(a, &lock); // 1
-      else if ((pos.x >= x+w/2) && (pos.y <= y+h/2)) tree2->addAgentHelper(a, &lock); // 2
-      else if ((pos.x >= x+w/2) && (pos.y >= y+h/2)) tree3->addAgentHelper(a, &lock); // 3
-      else if ((pos.x <= x+w/2) && (pos.y >= y+h/2)) tree4->addAgentHelper(a, &lock); // 4
+      if ((pos.x >= x+w/2) && (pos.y >= y+h/2)) tree3->addAgent(a); // 3
+      if ((pos.x <= x+w/2) && (pos.y <= y+h/2)) tree1->addAgent(a); // 1
+      if ((pos.x >= x+w/2) && (pos.y <= y+h/2)) tree2->addAgent(a); // 2
+      if ((pos.x <= x+w/2) && (pos.y >= y+h/2)) tree4->addAgent(a); // 4
       agents.erase(a);
     }
   }
+  omp_unset_lock(const_cast<omp_lock_t*>(&lock));
 }
 
 
@@ -120,11 +110,11 @@ void Ped::Ttree::addChildren() {
 Ped::Ttree* Ped::Ttree::getChildByPosition(double xIn, double yIn) {
     if((xIn <= x+w/2) && (yIn <= y+h/2))
         return tree1;
-    else if((xIn >= x+w/2) && (yIn <= y+h/2))
+    if((xIn >= x+w/2) && (yIn <= y+h/2))
         return tree2;
-    else if((xIn >= x+w/2) && (yIn >= y+h/2))
+    if((xIn >= x+w/2) && (yIn >= y+h/2))
         return tree3;
-    else if((xIn <= x+w/2) && (yIn >= y+h/2))
+    if((xIn <= x+w/2) && (yIn >= y+h/2))
         return tree4;
 
     // this should never happen

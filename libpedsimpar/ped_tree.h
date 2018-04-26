@@ -66,7 +66,6 @@ namespace Ped {
         virtual int cut();
         virtual void addChildren();
         Ttree* getChildByPosition(double x, double y);
-        void addAgentHelper(const Ped::Tagent *a, omp_lock_t *parentlock);
 
         bool isleaf;
         double x;
