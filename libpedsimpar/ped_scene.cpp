@@ -178,17 +178,10 @@ void Ped::Tscene::moveAgents(double h) {
     }
 
     // then move agents according to their forces
-    if (tree == NULL) {
-        #pragma omp parallel for
-        for (auto agent = agents.begin(); agent < agents.end(); agent++) {
-            (*agent)->move(h);
-        }
-    } else {
-        for (auto agent : agents) {
-            agent->move(h);
-        }
+    #pragma omp parallel for
+    for (auto agent = agents.begin(); agent < agents.end(); agent++) {
+        (*agent)->move(h);
     }
-
     // then output their new position if an OutputWriter is given.
 	for (auto ow : outputwriters) {
       ow->writeTimeStep(timestep);

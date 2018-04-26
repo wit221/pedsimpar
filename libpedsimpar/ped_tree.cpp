@@ -9,6 +9,7 @@
 
 #include <cassert>
 #include <cstddef>
+#include <iostream>
 
 using namespace std;
 
@@ -27,7 +28,7 @@ Ped::Ttree::Ttree(Ped::Tscene *pscene, int pdepth, double px, double py, double 
     tree2 = NULL;
     tree3 = NULL;
     tree4 = NULL;
-    omp_init_lock(const_cast<omp_lock_t*>(&lock));
+    omp_init_nest_lock(const_cast<omp_nest_lock_t*>(&lock));
 };
 
 
@@ -40,7 +41,7 @@ Ped::Ttree::~Ttree() {
 
 
 void Ped::Ttree::clear() {
-    omp_set_lock(const_cast<omp_lock_t*>(&lock));
+    omp_set_nest_lock(const_cast<omp_nest_lock_t*>(&lock));
     if(isleaf) {
         agents.clear();
     }
@@ -55,8 +56,8 @@ void Ped::Ttree::clear() {
         delete tree4;
         isleaf = true;
     }
-    omp_unset_lock(const_cast<omp_lock_t*>(&lock));
-    omp_destroy_lock(const_cast<omp_lock_t*>(&lock));
+    omp_unset_nest_lock(const_cast<omp_nest_lock_t*>(&lock));
+    omp_destroy_nest_lock(const_cast<omp_nest_lock_t*>(&lock));
 }
 
 
@@ -66,7 +67,10 @@ void Ped::Ttree::clear() {
 /// \date    2012-01-28
 /// \param   *a The agent to add
 void Ped::Ttree::addAgent(const Ped::Tagent *a) {
-  omp_set_lock(const_cast<omp_lock_t*>(&lock));
+  omp_set_nest_lock(const_cast<omp_nest_lock_t*>(&lock));
+  #ifdef _OPENMP
+  //cerr << a->getid() << " " << omp_get_thread_num() << endl;
+  #endif
   if (isleaf) {
     agents.insert(a);
     scene->treehash[a] = this;
@@ -74,9 +78,9 @@ void Ped::Ttree::addAgent(const Ped::Tagent *a) {
   else {
     const Tvector pos = a->getPosition();
     if ((pos.x >= x+w/2) && (pos.y >= y+h/2)) tree3->addAgent(a); // 3
-    if ((pos.x <= x+w/2) && (pos.y <= y+h/2)) tree1->addAgent(a); // 1
-    if ((pos.x >= x+w/2) && (pos.y <= y+h/2)) tree2->addAgent(a); // 2
-    if ((pos.x <= x+w/2) && (pos.y >= y+h/2)) tree4->addAgent(a); // 4
+    else if ((pos.x <= x+w/2) && (pos.y <= y+h/2)) tree1->addAgent(a); // 1
+    else if ((pos.x >= x+w/2) && (pos.y <= y+h/2)) tree2->addAgent(a); // 2
+    else if ((pos.x <= x+w/2) && (pos.y >= y+h/2)) tree4->addAgent(a); // 4
   }
   
   if (agents.size() > 8) {
@@ -86,13 +90,13 @@ void Ped::Ttree::addAgent(const Ped::Tagent *a) {
       const Ped::Tagent *a = (*agents.begin());
       const Tvector pos = a->getPosition();
       if ((pos.x >= x+w/2) && (pos.y >= y+h/2)) tree3->addAgent(a); // 3
-      if ((pos.x <= x+w/2) && (pos.y <= y+h/2)) tree1->addAgent(a); // 1
-      if ((pos.x >= x+w/2) && (pos.y <= y+h/2)) tree2->addAgent(a); // 2
-      if ((pos.x <= x+w/2) && (pos.y >= y+h/2)) tree4->addAgent(a); // 4
+      else if ((pos.x <= x+w/2) && (pos.y <= y+h/2)) tree1->addAgent(a); // 1
+      else if ((pos.x >= x+w/2) && (pos.y <= y+h/2)) tree2->addAgent(a); // 2
+      else if ((pos.x <= x+w/2) && (pos.y >= y+h/2)) tree4->addAgent(a); // 4
       agents.erase(a);
     }
   }
-  omp_unset_lock(const_cast<omp_lock_t*>(&lock));
+  omp_unset_nest_lock(const_cast<omp_nest_lock_t*>(&lock));
 }
 
 
@@ -100,10 +104,12 @@ void Ped::Ttree::addAgent(const Ped::Tagent *a) {
 /// \author  chgloor
 /// \date    2012-01-28
 void Ped::Ttree::addChildren() {
+    omp_set_nest_lock(const_cast<omp_nest_lock_t*>(&lock));
     tree1 = new Ped::Ttree(scene, depth+1, x, y, w/2, h/2);
     tree2 = new Ped::Ttree(scene, depth+1, x+w/2, y, w/2, h/2);
     tree3 = new Ped::Ttree(scene, depth+1, x+w/2, y+h/2, w/2, h/2);
     tree4 = new Ped::Ttree(scene, depth+1, x, y+h/2, w/2, h/2);
+    omp_unset_nest_lock(const_cast<omp_nest_lock_t*>(&lock));
 }
 
 
@@ -128,25 +134,30 @@ Ped::Ttree* Ped::Ttree::getChildByPosition(double xIn, double yIn) {
 /// \date    2012-01-28
 /// \param   *a the agent to update
 void Ped::Ttree::moveAgent(const Ped::Tagent *a) {
+  omp_set_nest_lock(const_cast<omp_nest_lock_t*>(&lock));
   const Tvector pos = a->getPosition();
   if ((pos.x < x) || (pos.x > (x+w)) || (pos.y < y) || (pos.y > (y+h))) {
-    scene->placeAgent(a);
     agents.erase(a);
+    omp_unset_nest_lock(const_cast<omp_nest_lock_t*>(&lock));
+    scene->placeAgent(a);
+  } else {
+    omp_unset_nest_lock(const_cast<omp_nest_lock_t*>(&lock));
   }
 }
 
 
 bool Ped::Ttree::removeAgent(const Ped::Tagent *a) {
-  omp_set_lock(const_cast<omp_lock_t*>(&lock));
+  omp_set_nest_lock(const_cast<omp_nest_lock_t*>(&lock));
   if(isleaf) {
     size_t removedCount = agents.erase(a);
+    omp_unset_nest_lock(const_cast<omp_nest_lock_t*>(&lock));
     return (removedCount > 0);
   }
   else {
-    const Tvector pos = a->getPosition();  
+    const Tvector pos = a->getPosition();
+    omp_unset_nest_lock(const_cast<omp_nest_lock_t*>(&lock));
     return getChildByPosition(pos.x, pos.y)->removeAgent(a);
   }
-  omp_unset_lock(const_cast<omp_lock_t*>(&lock));
 }
 
 
@@ -156,11 +167,14 @@ bool Ped::Ttree::removeAgent(const Ped::Tagent *a) {
 /// \date    2012-01-28
 /// \return  the number of agents in this and all child nodes.
 int Ped::Ttree::cut() {
-    omp_set_lock(const_cast<omp_lock_t*>(&lock));
-    if (isleaf)
-        return agents.size();
-
+    omp_set_nest_lock(const_cast<omp_nest_lock_t*>(&lock));
     int count = 0;
+    if (isleaf) {
+        omp_unset_nest_lock(const_cast<omp_nest_lock_t*>(&lock));
+        return agents.size();
+    }
+
+
     count += tree1->cut();
     count += tree2->cut();
     count += tree3->cut();
@@ -184,8 +198,8 @@ int Ped::Ttree::cut() {
         delete tree3;
         delete tree4;
     }
+    omp_unset_nest_lock(const_cast<omp_nest_lock_t*>(&lock));
     return count;
-    omp_unset_lock(const_cast<omp_lock_t*>(&lock));
 }
 
 
@@ -195,9 +209,11 @@ int Ped::Ttree::cut() {
 /// \return  The set of agents
 /// \todo This might be not very efficient, since all childs are checked, too. And then the set (set of pointer, but still) is being copied around.
 set<const Ped::Tagent*> Ped::Ttree::getAgents() const {
-    omp_set_lock(const_cast<omp_lock_t*>(&lock));
-    if (isleaf)
+    omp_set_nest_lock(const_cast<omp_nest_lock_t*>(&lock));
+    if (isleaf) {
+        omp_unset_nest_lock(const_cast<omp_nest_lock_t*>(&lock));
         return agents;
+    }
 
     set<const Ped::Tagent*> ta;
     set<const Ped::Tagent*> t1 = tree1->getAgents();
@@ -208,13 +224,13 @@ set<const Ped::Tagent*> Ped::Ttree::getAgents() const {
     ta.insert(t2.begin(), t2.end());
     ta.insert(t3.begin(), t3.end());
     ta.insert(t4.begin(), t4.end());
+    omp_unset_nest_lock(const_cast<omp_nest_lock_t*>(&lock));
     return ta;
-    omp_unset_lock(const_cast<omp_lock_t*>(&lock));
 }
 
 
 void Ped::Ttree::getAgents(list<const Ped::Tagent*>& outputList) const {
-    omp_set_lock(const_cast<omp_lock_t*>(&lock));
+    omp_set_nest_lock(const_cast<omp_nest_lock_t*>(&lock));
     if(isleaf) {
         for(const Ped::Tagent* currentAgent : agents)
             outputList.push_back(currentAgent);
@@ -225,7 +241,7 @@ void Ped::Ttree::getAgents(list<const Ped::Tagent*>& outputList) const {
         tree3->getAgents(outputList);
         tree4->getAgents(outputList);
     }
-    omp_unset_lock(const_cast<omp_lock_t*>(&lock));
+    omp_unset_nest_lock(const_cast<omp_nest_lock_t*>(&lock));
 }
 
 
