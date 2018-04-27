@@ -4,6 +4,7 @@
 #include <thread>
 #endif
 int main(){
+  
   Timing t;
   int TF_ID = t.addMetric("a");
   int SF_ID = t.addMetric("b", TF_ID);

@@ -8,7 +8,7 @@ all: libpedsimpar.so
 libpedsimpar.so: $(OFILES)
 	$(CXX) $(CXXFLAGS) -shared -Wl,-soname,libpedsimpar.so -o libpedsimpar.so $(OFILES)
 
-examples: libpedsim.so examples/example*.cpp
+examples: libpedsimpar.so examples/example*.cpp
 	g++ examples/example01.cpp -o example01 -I. -lpedsim -L. -g -std=c++0x
 	g++ examples/example02.cpp -o example02 -I. -lpedsim -L. -g -std=c++0x
 	g++ examples/example03.cpp -o example03 -I. -lpedsim -L. -g -std=c++0x
