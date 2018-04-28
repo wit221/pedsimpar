@@ -12,7 +12,7 @@ struct lookaheadForceFunctor : public thrust::binary_function<double2,double2,in
     lookaheadForceFunctor(double2 _e, double2 _p, double2 _v) : e(_e), p(_p), v(_v) {}
 
     __host__ __device__
-    float operator()(const double2& otherp, const double2& otherv) const { 
+    int operator()(const double2& otherp, const double2& otherv) const {
         const double pi = 3.14159265;
         double distancex = otherp.x - p.x;
         double distancey = otherp.y - p.y;
@@ -60,17 +60,17 @@ int cudaLookaheadCount(Ped::Tvector e, Ped::Tvector p, Ped::Tvector v, int id, c
     thrust::device_vector<double2> vvec = vvec_host;
     thrust::device_vector<int> result(N);
 
-    thrust::transform(pvec.begin(), vvec.begin(), pvec.end(), result.begin(),
+    thrust::transform(pvec.begin(), pvec.end(), vvec.begin(), result.begin(),
         lookaheadForceFunctor(make_double2(e.x, e.y), make_double2(p.x, p.y), make_double2(v.x, v.y)));
 
-    if (id == 7) {
+    /*if (id == 7) {
         cerr << "cuda:";
         for (int i = 0; i < N; i++) {
             //cerr << result[i] << " ";
             cerr << pvec_host[i].x << " " << pvec_host[i].y << " " << vvec_host[i].x << " " << vvec_host[i].y << " " << result[i] << endl;
         }
         cerr << endl;
-    }
+    }*/
 
     int lookaheadCount = thrust::reduce(result.begin(), result.end());
     return lookaheadCount;

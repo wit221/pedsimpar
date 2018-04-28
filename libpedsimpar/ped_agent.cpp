@@ -438,48 +438,17 @@ Ped::Tvector Ped::Tagent::obstacleForce(const set<const Ped::Tagent*> &neighbors
 /// \param e is a vector defining the direction in which the agent should look
 ///          ahead to. Usually, this is the direction he wants to walk to.
 Ped::Tvector Ped::Tagent::lookaheadForce(Ped::Tvector e, const set<const Ped::Tagent*> &neighbors) {
-    const double pi = 3.14159265;
+    int N = neighbors.size();
     int lookforwardcount = 0;
-    for (set<const Ped::Tagent*>::iterator iter = neighbors.begin(); iter!=neighbors.end(); ++iter) {
-        const Ped::Tagent* other = *iter;
 
-        // don't compute this force for the agent himself
-        if (other->id == id) continue;
-
-        double distancex = other->p.x - p.x;
-        double distancey = other->p.y - p.y;
-        double dist2 = (distancex * distancex + distancey * distancey); // 2D
-        if (dist2 < 400) { // look ahead feature
-            double at2v = atan2(-e.x, -e.y); // was vx, vy  --chgloor 2012-01-15
-            double at2d = atan2(-distancex, -distancey);
-            double at2v2 = atan2(-other->v.x, -other->v.y);
-            double s = at2d - at2v;
-            if (s > pi) s -= 2*pi;
-            if (s < -pi) s += 2*pi;
-            double vv = at2v - at2v2;
-            if (vv > pi) vv -= 2*pi;
-            if (vv < -pi) vv += 2*pi;
-            if (abs(vv) > 2.5) { // opposite direction
-                if ((s < 0) && (s > -0.3)) // position vor mir, in meine richtung
-                    lookforwardcount--;
-                if ((s > 0) && (s < 0.3))
-                    lookforwardcount++;
-            }
-        }
-    }
-
-    if (id == 7) {
-        cerr << id << " " << lookforwardcount << endl;
-        int testcount = cudaLookaheadCount(e, p, v, id, neighbors);
-        cerr << testcount << endl;
-        cerr << "serial:";
+    if (N < 1024) {
+        const double pi = 3.14159265;
         for (set<const Ped::Tagent*>::iterator iter = neighbors.begin(); iter!=neighbors.end(); ++iter) {
             const Ped::Tagent* other = *iter;
 
             // don't compute this force for the agent himself
             if (other->id == id) continue;
 
-            int mydelta = 0;
             double distancex = other->p.x - p.x;
             double distancey = other->p.y - p.y;
             double dist2 = (distancex * distancex + distancey * distancey); // 2D
@@ -495,19 +464,16 @@ Ped::Tvector Ped::Tagent::lookaheadForce(Ped::Tvector e, const set<const Ped::Ta
                 if (vv < -pi) vv += 2*pi;
                 if (abs(vv) > 2.5) { // opposite direction
                     if ((s < 0) && (s > -0.3)) // position vor mir, in meine richtung
-                        mydelta = -1;
+                        lookforwardcount--;
                     if ((s > 0) && (s < 0.3))
-                        mydelta = 1;
+                        lookforwardcount++;
                 }
             }
-
-            cerr << other->p.x << " " << other->p.y << " " << other->v.x << " " << other->v.y << " " << mydelta << endl;
         }
-        cerr << endl;
+    } else {
+        lookforwardcount = cudaLookaheadCount(e, p, v, id, neighbors);
     }
-
     
-
     Ped::Tvector lf;
     if (lookforwardcount < 0) {
         lf.x = 0.5f *  e.y; // was vx, vy  --chgloor 2012-01-15
