@@ -67,7 +67,7 @@ int cudaLookaheadCount(Ped::Tvector e, Ped::Tvector p, Ped::Tvector v, int id, c
         cerr << "cuda:";
         for (int i = 0; i < N; i++) {
             //cerr << result[i] << " ";
-            cerr << pvec_host[i].x << " " << pvec_host[i].y << " " << vvec_host[i].x << " " << vvec_host[i].y << endl;
+            cerr << pvec_host[i].x << " " << pvec_host[i].y << " " << vvec_host[i].x << " " << vvec_host[i].y << " " << result[i] << endl;
         }
         cerr << endl;
     }

@@ -479,7 +479,29 @@ Ped::Tvector Ped::Tagent::lookaheadForce(Ped::Tvector e, const set<const Ped::Ta
             // don't compute this force for the agent himself
             if (other->id == id) continue;
 
-            cerr << other->p.x << " " << other->p.y << " " << other->v.x << " " << other->v.y << endl;
+            int mydelta = 0;
+            double distancex = other->p.x - p.x;
+            double distancey = other->p.y - p.y;
+            double dist2 = (distancex * distancex + distancey * distancey); // 2D
+            if (dist2 < 400) { // look ahead feature
+                double at2v = atan2(-e.x, -e.y); // was vx, vy  --chgloor 2012-01-15
+                double at2d = atan2(-distancex, -distancey);
+                double at2v2 = atan2(-other->v.x, -other->v.y);
+                double s = at2d - at2v;
+                if (s > pi) s -= 2*pi;
+                if (s < -pi) s += 2*pi;
+                double vv = at2v - at2v2;
+                if (vv > pi) vv -= 2*pi;
+                if (vv < -pi) vv += 2*pi;
+                if (abs(vv) > 2.5) { // opposite direction
+                    if ((s < 0) && (s > -0.3)) // position vor mir, in meine richtung
+                        mydelta = -1;
+                    if ((s > 0) && (s < 0.3))
+                        mydelta = 1;
+                }
+            }
+
+            cerr << other->p.x << " " << other->p.y << " " << other->v.x << " " << other->v.y << " " << mydelta << endl;
         }
         cerr << endl;
     }
