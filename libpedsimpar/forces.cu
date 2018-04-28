@@ -48,9 +48,11 @@ int cudaLookaheadCount(Ped::Tvector e, Ped::Tvector p, Ped::Tvector v, int id, c
         const Ped::Tagent* other = *iter;
 
         // don't compute this force for the agent himself
-        if (other->id == id) continue;
-        pvec_host[i] = make_double2(other->p.x, other->p.y);
-        vvec_host[i] = make_double2(other->v.x, other->v.y);
+        if (other->getid() == id) continue;
+        Ped::Tvector op = other->getPosition();
+        Ped::Tvector ov = other->getVelocity();
+        pvec_host[i] = make_double2(op.x, op.y);
+        vvec_host[i] = make_double2(ov.x, ov.y);
         i++;
     }
 
@@ -60,6 +62,16 @@ int cudaLookaheadCount(Ped::Tvector e, Ped::Tvector p, Ped::Tvector v, int id, c
 
     thrust::transform(pvec.begin(), vvec.begin(), pvec.end(), result.begin(),
         lookaheadForceFunctor(make_double2(e.x, e.y), make_double2(p.x, p.y), make_double2(v.x, v.y)));
+
+    if (id == 7) {
+        cerr << "cuda:";
+        for (int i = 0; i < N; i++) {
+            //cerr << result[i] << " ";
+            cerr << pvec_host[i].x << " " << pvec_host[i].y << " " << vvec_host[i].x << " " << vvec_host[i].y << endl;
+        }
+        cerr << endl;
+    }
+
     int lookaheadCount = thrust::reduce(result.begin(), result.end());
     return lookaheadCount;
 }

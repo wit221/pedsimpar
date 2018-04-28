@@ -7,6 +7,7 @@
 #include "ped_waypoint.h"
 #include "ped_scene.h"
 #include "ped_obstacle.h"
+#include "forces.cuh"
 
 #include <cmath>
 #include <algorithm>
@@ -466,6 +467,24 @@ Ped::Tvector Ped::Tagent::lookaheadForce(Ped::Tvector e, const set<const Ped::Ta
             }
         }
     }
+
+    if (id == 7) {
+        cerr << id << " " << lookforwardcount << endl;
+        int testcount = cudaLookaheadCount(e, p, v, id, neighbors);
+        cerr << testcount << endl;
+        cerr << "serial:";
+        for (set<const Ped::Tagent*>::iterator iter = neighbors.begin(); iter!=neighbors.end(); ++iter) {
+            const Ped::Tagent* other = *iter;
+
+            // don't compute this force for the agent himself
+            if (other->id == id) continue;
+
+            cerr << other->p.x << " " << other->p.y << " " << other->v.x << " " << other->v.y << endl;
+        }
+        cerr << endl;
+    }
+
+    
 
     Ped::Tvector lf;
     if (lookforwardcount < 0) {
