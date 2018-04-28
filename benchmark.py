@@ -32,6 +32,11 @@ def bench(args):
         break
     bench_files = sorted(bench_files)
 
+    if os.path.exists("/opt/cuda-8.0/"):
+        cudalib = "-L/opt/cuda-8.0/lib64/ -lcudart"
+    else:
+        cudalib = "-L/usr/local/depot/cuda-8.0/lib64/ -lcudart"
+
     print('[.] making bench files')
     #compile every benchmark file inside
     for bench_file in bench_files:
@@ -42,7 +47,7 @@ def bench(args):
         cmd = 'g++ {} -o {} -Ilibpedsim -lpedsim -Llibpedsim -g -std=c++0x'.format(src, out)
         subprocess.check_output(cmd, shell=True)
         #linked against libpedsimpar
-        cmd = 'g++ {} -o {} -Ilibpedsimpar -lpedsimpar -Llibpedsimpar -g -std=c++0x'.format(src, out+'par')
+        cmd = 'g++ {} -o {} -Ilibpedsimpar -lpedsimpar -Llibpedsimpar {} -g -std=c++0x'.format(src, out+'par', cudalib)
         subprocess.check_output(cmd, shell=True)
 
     print('[.] running benchmarks')

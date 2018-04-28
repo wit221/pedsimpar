@@ -5,6 +5,7 @@ import subprocess
 import time
 import argparse
 import sys
+import os
 
 parser = argparse.ArgumentParser(description='Process some integers.')
 parser.add_argument('-n', type=int, metavar="NUMAGENTS", nargs='?', default=100, help='Number of agents (0 < n <= 1000)')
@@ -22,7 +23,11 @@ subprocess.check_output(["make"], cwd="./libpedsimpar")
 
 print("[.] making test executables")
 subprocess.check_output("g++ ./regress/regress.cpp -o regress/regress_seq -Ilibpedsim -lpedsim -Llibpedsim -g -std=c++0x", shell=True)
-subprocess.check_output("g++ ./regress/regress.cpp -o regress/regress_par -Ilibpedsimpar -lpedsimpar -Llibpedsimpar -g -std=c++0x", shell=True)
+if os.path.exists("/opt/cuda-8.0/"):
+    cudalib = "-L/opt/cuda-8.0/lib64/ -lcudart"
+else:
+    cudalib = "-L/usr/local/depot/cuda-8.0/lib64/ -lcudart"
+subprocess.check_output("g++ ./regress/regress.cpp -o regress/regress_par -Ilibpedsimpar -lpedsimpar -Llibpedsimpar {} -g -std=c++0x".format(cudalib), shell=True)
 
 print("[.] running sequential")
 start = time.time()
