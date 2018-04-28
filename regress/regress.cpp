@@ -67,10 +67,10 @@ void simulate(int numagents, int maxtime, bool quadtree) {
         a->setfactorsocialforce(10.0);
         a->setfactorobstacleforce(2.0);
         if (a->getid() % 2 == 0) {
-            a->setPosition(-80 - (a->getid() / 500), -25 + (a->getid() % 500)/10.0, 0);
+            a->setPosition(-80 - (a->getid() / 5000), -25 + (a->getid() % 5000)/100.0, 0);
             a->addWaypoint(w1);
         } else {
-            a->setPosition(80 + (a->getid() / 500), -25 + (a->getid() % 500)/10.0, 0);
+            a->setPosition(80 + (a->getid() / 5000), -25 + (a->getid() % 5000)/100.0, 0);
             a->addWaypoint(w2);
         }
         pedscene->addAgent(a);
@@ -135,8 +135,8 @@ int main(int argc, char *argv[]) {
         }
     }
 
-    if (numagents <= 0 || numagents > 10000) {
-        cout << "Invalid number of agents (0 < numagents <= 10000)" << endl;
+    if (numagents <= 0 || numagents > 100000) {
+        cout << "Invalid number of agents (0 < numagents <= 100000)" << endl;
         exit(0);
     }
 

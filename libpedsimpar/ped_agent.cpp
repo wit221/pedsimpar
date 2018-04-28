@@ -441,7 +441,7 @@ Ped::Tvector Ped::Tagent::lookaheadForce(Ped::Tvector e, const set<const Ped::Ta
     int N = neighbors.size();
     int lookforwardcount = 0;
 
-    if (N < 1024) {
+    if (N < 100000) {
         const double pi = 3.14159265;
         for (set<const Ped::Tagent*>::iterator iter = neighbors.begin(); iter!=neighbors.end(); ++iter) {
             const Ped::Tagent* other = *iter;
@@ -471,6 +471,7 @@ Ped::Tvector Ped::Tagent::lookaheadForce(Ped::Tvector e, const set<const Ped::Ta
             }
         }
     } else {
+        //cerr << id << " " << N << endl;
         lookforwardcount = cudaLookaheadCount(e, p, v, id, neighbors);
     }
     

@@ -13,8 +13,8 @@ parser.add_argument('-t', type=int, metavar="MAXTIME", nargs='?', default=20000,
 parser.add_argument('-q', action='store_true', help='Use quadtree')
 args = parser.parse_args()
 
-if args.n <= 0 or args.n > 10000:
-    print("[-] Invalid number of agents (0 < n <= 10000)")
+if args.n <= 0 or args.n > 100000:
+    print("[-] Invalid number of agents (0 < n <= 100000)")
     sys.exit(0)
 
 print("[.] making libraries")
