@@ -1,6 +1,21 @@
 - MPI
   - using quad tree:
-  -one quad tree per processor
+    - one quad tree per processor
+      -At startup, master thread spawns other threads
+        - provides limit of each scene to each thread
+      - At each frame:
+        - compute forces of owned agents
+        - get new positions of nodes
+          - if poitions within boundaries, move
+          - if positions outside boundaries:
+            - pass agent to appropriate processor
+            - remove agent from owned agents list
+        - send all owned agents to master
+        -if master: write all agents to outputwriter
+  -dealing with MPI and OOP:
+    - example and superscenee should run on one thread. The remainign scenes
+    should each run on its own thread.
+
 - not using quad tree:
   -divide by hrizontal bands
   - make 1 scene object per processor
