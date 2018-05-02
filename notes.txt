@@ -1,0 +1,92 @@
+- MPI
+  - using quad tree:
+  -one quad tree per processor
+- not using quad tree:
+  -divide by hrizontal bands
+  - make 1 scene object per processor
+    - each processor agnostic of scene features on other processors
+  - each processor has 5 bands (vectors):
+    1. close agents in above processor
+    2. own agents close to above processor
+    3. own agents far from above and below processor
+    4. own agents close to below processor.
+    5. close agents in below processor.
+
+
+
+
+
+
+1. Library usage
+- Setup
+  - Create output writer ow
+    - Set ow properties
+  - Create Tsene pedscene
+  - Link ow and pedscene
+  - Create Twaypoints
+  - Create obstacles
+  - Add obstacles to pedscene
+  - Create agents
+    - add waypoints to agents
+    - set positions
+    - add agent to scene
+- Simulation
+  - for each timestep:
+    -call moveAgents() on pedscene
+- Cleanup
+
+2. Library Operation
+- Overarching class is PedScene
+  - holds:
+    - agents vector
+    - tree
+    - obstacle vextor
+    - Twaypoint vector
+  - Everythin set-up as in library usage
+  - all objects are creates separately and then linked via public methods to Scene
+  - only Ttree is created in constructor
+- sim operation: moveAgents()
+  - update time step
+  - update forces via computeForces()
+    -agent->computeForces()
+  - move agents by forces move()
+    -
+  - output positions
+
+- getNeighbors():
+  - if no tree, return all
+  - else:
+    -recursively (using stack) go down the tree for nodes that are within range
+    -if leaf, add all agents in node
+
+- Main class is Tagent
+  - Constructor:
+    - set up stuff
+    - set random max speed
+    - set relative forces' importances
+    - set a radius, obstacle force, and relax time
+    - set waypoint behavior
+
+- agent->computeForces():
+  - First, get all neighbors via getNeighbors()
+  - compute desieredForce()
+    - no iterations
+    - need info about other agents
+    -
+  - compute lookaheadforce()
+    - go through all neighbors, compute some stuff
+  - compute socialforce()
+    - go through all neighbors
+  - compute factorobstacleforce()
+    - go through all obstacles in the scene
+  - compute myForce()
+
+CHANGES TODO:
+  - agent:
+    - set neighborhoodRange as parameter
+    - set quad tree capacity and min cap as a parameter
+    - set maxDist social force as param
+    - remove removeWaypoint bug
+
+BAD STUFF:
+  - checking distances of neighbors in forces constantly

@@ -47,4 +47,4 @@ regress/regress_seq
 regress/regress_par
 
 pedsim_out*.txt
-notes.txt
+#notes.txt

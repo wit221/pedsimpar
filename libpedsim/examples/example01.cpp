@@ -13,8 +13,8 @@
 using namespace std;
 
 int main(int argc, char *argv[]) {
-
-    // create an output writer which will send output to a file 
+  
+    // create an output writer which will send output to a file
     Ped::OutputWriter *ow = new Ped::FileOutputWriter();
     ow->setScenarioName("Example 01");
 

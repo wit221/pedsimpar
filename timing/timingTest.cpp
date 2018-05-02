@@ -1,4 +1,5 @@
 #include "timing.h"
+
 #ifndef chrono
 #include <chrono>
 #include <thread>

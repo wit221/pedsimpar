@@ -3,21 +3,21 @@ CXXFLAGS = -g -O2 -fno-inline -std=c++0x
 all: libpedsim.so
 
 libpedsim.so: ped_obstacle.cpp ped_vector.cpp ped_waypoint.cpp ped_agent.cpp ped_scene.cpp ped_tree.cpp
-	$(CXX) $(CXXFLAGS) -fPIC -c ped_vector.cpp -o ped_vector.o
-	$(CXX) $(CXXFLAGS) -fPIC -c ped_outputwriter.cpp -o ped_outputwriter.o
-	$(CXX) $(CXXFLAGS) -fPIC -c ped_scene.cpp -o ped_scene.o
-	$(CXX) $(CXXFLAGS) -fPIC -c ped_tree.cpp -o ped_tree.o
-	$(CXX) $(CXXFLAGS) -fPIC -c ped_obstacle.cpp -o ped_obstacle.o
-	$(CXX) $(CXXFLAGS) -fPIC -c ped_waypoint.cpp -o ped_waypoint.o
-	$(CXX) $(CXXFLAGS) -fPIC -c ped_agent.cpp -o ped_agent.o
+	$(CXX) $(CXXFLAGS) -fPIC -c ped_vector.cpp -o ped_vector.o -I../timing -L../timing -ltiming
+	$(CXX) $(CXXFLAGS) -fPIC -c ped_outputwriter.cpp -o ped_outputwriter.o -I../timing -L../timing -ltiming
+	$(CXX) $(CXXFLAGS) -fPIC -c ped_scene.cpp -o ped_scene.o -I../timing -L../timing -ltiming
+	$(CXX) $(CXXFLAGS) -fPIC -c ped_tree.cpp -o ped_tree.o -I../timing -L../timing -ltiming
+	$(CXX) $(CXXFLAGS) -fPIC -c ped_obstacle.cpp -o ped_obstacle.o -I../timing -L../timing -ltiming
+	$(CXX) $(CXXFLAGS) -fPIC -c ped_waypoint.cpp -o ped_waypoint.o -I../timing -L../timing -ltiming
+	$(CXX) $(CXXFLAGS) -fPIC -c ped_agent.cpp -o ped_agent.o -I../timing -L../timing -ltiming
 	$(CXX) $(CXXFLAGS) -shared -Wl,-soname,libpedsim.so -o libpedsim.so ped_obstacle.o ped_vector.o ped_waypoint.o ped_agent.o ped_scene.o ped_tree.o ped_outputwriter.o
 
 examples: libpedsim.so examples/example*.cpp
-	g++ examples/example01.cpp -o example01 -I. -lpedsim -L. -g -std=c++0x
-	g++ examples/example02.cpp -o example02 -I. -lpedsim -L. -g -std=c++0x
-	g++ examples/example03.cpp -o example03 -I. -lpedsim -L. -g -std=c++0x
-	g++ examples/example04.cpp -o example04 -I. -lpedsim -L. -g -std=c++0x
-	g++ examples/example05.cpp -o example05 -I. -lpedsim -L. -g -std=c++0x
+	g++ examples/example01.cpp -o example01 -I../timing -L../timing -ltiming -I. -lpedsim -L.  -g -std=c++0x
+	g++ examples/example02.cpp -o example02 -I../timing -L../timing -ltiming -I. -lpedsim -L. -I../timing -g -std=c++0x
+	g++ examples/example03.cpp -o example03 -I../timing -L../timing -ltiming -I. -lpedsim -L. -I../timing -g -std=c++0x
+	g++ examples/example04.cpp -o example04 -I../timing -L../timing -ltiming -I. -lpedsim -L. -I../timing -g -std=c++0x
+	g++ examples/example05.cpp -o example05 -I../timing -L../timing -ltiming -I. -lpedsim -L. -I../timing 	-g -std=c++0x
 
 doc: documentation/doxygen.conf
 	doxygen documentation/doxygen.conf

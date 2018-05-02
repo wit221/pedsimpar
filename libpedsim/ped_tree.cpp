@@ -63,6 +63,7 @@ void Ped::Ttree::clear() {
 /// \date    2012-01-28
 /// \param   *a The agent to add
 void Ped::Ttree::addAgent(const Ped::Tagent *a) {
+
   if (isleaf) {
     agents.insert(a);
     scene->treehash[a] = this;
@@ -74,7 +75,7 @@ void Ped::Ttree::addAgent(const Ped::Tagent *a) {
     if ((pos.x >= x+w/2) && (pos.y <= y+h/2)) tree2->addAgent(a); // 2
     if ((pos.x <= x+w/2) && (pos.y >= y+h/2)) tree4->addAgent(a); // 4
   }
-  
+
   if (agents.size() > 8) {
     isleaf = false;
     addChildren();
@@ -123,11 +124,18 @@ Ped::Ttree* Ped::Ttree::getChildByPosition(double xIn, double yIn) {
 /// \date    2012-01-28
 /// \param   *a the agent to update
 void Ped::Ttree::moveAgent(const Ped::Tagent *a) {
+  scene->t.startTimer(scene->GET_AGENT_POS);
   const Tvector pos = a->getPosition();
+  scene->t.endTimer(scene->GET_AGENT_POS);
+
+  scene->t.startTimer(scene->PLACE_AGENT);
+
   if ((pos.x < x) || (pos.x > (x+w)) || (pos.y < y) || (pos.y > (y+h))) {
     scene->placeAgent(a);
     agents.erase(a);
   }
+  scene->t.endTimer(scene->PLACE_AGENT);
+
 }
 
 
@@ -137,7 +145,7 @@ bool Ped::Ttree::removeAgent(const Ped::Tagent *a) {
     return (removedCount > 0);
   }
   else {
-    const Tvector pos = a->getPosition();  
+    const Tvector pos = a->getPosition();
     return getChildByPosition(pos.x, pos.y)->removeAgent(a);
   }
 }

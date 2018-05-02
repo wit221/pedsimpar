@@ -34,12 +34,34 @@ Ped::Tscene::Tscene() : tree(NULL), timestep(0) {};
 /// \param width is the total width of the boundary. Basically from left to right.
 /// \param height is the total height of the boundary. Basically from top to down.
 Ped::Tscene::Tscene(double left, double top, double width, double height) : Tscene() {
+    // t = new Timing::Timing();
+    STARTUP = t.addMetric("Startup");
+    CALC_FORCES = t.addMetric("Calculate forces");
+    MAKE_MOVES = t.addMetric("Make moves");
+    CLEAR_SCENE = t.addMetric("Clear scene");
+    FACTOR_LOOKAHEAD_FORCE = t.addMetric("Factor lookahead force", CALC_FORCES);
+    FACTOR_SOCIAL_FORCE = t.addMetric("Factor social force", CALC_FORCES);
+    FACTOR_OBSTACLE_FORCE = t.addMetric("Factor obstacle force", CALC_FORCES);
+    GET_NEIGHBORS = t.addMetric("Getting neighbors", CALC_FORCES);
+
+
+    MOVE_AGENT = t.addMetric("Moving agent", MAKE_MOVES);
+
+    GET_AGENT_POS = t.addMetric("Getting agent positions", MAKE_MOVES);
+
+    PLACE_AGENT = t.addMetric("Placing agents", MAKE_MOVES);
+
+    GET_OBSTACLES = t.addMetric("Getting obstacles", MAKE_MOVES);
+
+    t.startTimer(STARTUP);
     tree = new Ped::Ttree(this, 0, left, top, width, height);
+    t.endTimer(STARTUP);
 }
 
 /// Destructor
 /// \date    2012-02-04
 Ped::Tscene::~Tscene() {
+    t.summary();
     delete(tree);
 }
 
@@ -114,7 +136,7 @@ bool Ped::Tscene::removeAgent(Ped::Tagent *a) {
     // remove agent from the tree
     if (tree != NULL)
         tree->removeAgent(a);
-    
+
     // remove agent from the scene, report succesful removal
     agents.erase(it);
 
@@ -142,7 +164,7 @@ bool Ped::Tscene::removeObstacle(Ped::Tobstacle *o) {
 /// Remove a waypoint from the scene.
 /// \warning Used to delete the waypoint. I don't think Tscene has ownership of the assigned objects. Will not delete from now on.
 bool Ped::Tscene::removeWaypoint(Ped::Twaypoint* w) {
-  /* Not sure we want that! 
+  /* Not sure we want that!
     // remove waypoint from all agents
     for(vector<Tagent*>::iterator iter = agents.begin(); iter != agents.end(); ++iter) {
         Tagent *a = (*iter);
@@ -169,10 +191,14 @@ void Ped::Tscene::moveAgents(double h) {
     timestep++;
 
     // first update forces
+    t.startTimer(CALC_FORCES);
     for (Tagent* agent : agents) agent->computeForces();
+    t.endTimer(CALC_FORCES);
 
     // then move agents according to their forces
+    t.startTimer(MAKE_MOVES);
     for (Tagent* agent : agents) agent->move(h);
+    t.endTimer(MAKE_MOVES);
 
     // then output their new position if an OutputWriter is given.
 	for (auto ow : outputwriters) {
@@ -195,8 +221,10 @@ void Ped::Tscene::placeAgent(const Ped::Tagent *a) {
 /// \date    2012-01-28
 /// \param   *a the agent to move.
 void Ped::Tscene::moveAgent(const Ped::Tagent *a) {
+    t.startTimer(MOVE_AGENT);
     if (tree != NULL)
         treehash[a]->moveAgent(a);
+    t.endTimer(MOVE_AGENT);
 }
 
 /// This triggers a cleanup of the tree structure. Unused leaf nodes are collected in order to

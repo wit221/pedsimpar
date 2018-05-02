@@ -466,7 +466,7 @@ Ped::Tvector Ped::Tagent::lookaheadForce(Ped::Tvector e, const set<const Ped::Ta
             }
         }
     }
-  
+
 
     Ped::Tvector lf;
     if (lookforwardcount < 0) {
@@ -499,7 +499,7 @@ Ped::Tvector Ped::Tagent::myForce(Ped::Tvector e, const set<const Ped::Tagent*> 
 void Ped::Tagent::computeForces() {
     const double neighborhoodRange = 20.0;
     auto neighbors = scene->getNeighbors(p.x, p.y, neighborhoodRange);
-
+    
     desiredforce = desiredForce();
     if (factorlookaheadforce > 0) lookaheadforce = lookaheadForce(desiredDirection, neighbors);
     if (factorsocialforce > 0) socialforce = socialForce(neighbors);

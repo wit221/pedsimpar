@@ -39,7 +39,7 @@ def bench(args):
         src = os.path.join(bench_src_path, bench_file)
         out = os.path.join(bench_cache_path, bench_file.split('.')[0])
 
-        cmd = 'g++ {} -o {} -Ilibpedsim -lpedsim -Llibpedsim -g -std=c++0x'.format(src, out)
+        cmd = 'g++ {} -o {} -Itiming -ltiming -Ltiming -Ilibpedsim -lpedsim -Llibpedsim  -g -std=c++0x'.format(src, out)
         subprocess.check_output(cmd, shell=True)
         #linked against libpedsimpar
         cmd = 'g++ {} -o {} -Ilibpedsimpar -lpedsimpar -Llibpedsimpar -g -std=c++0x'.format(src, out+'par')
@@ -55,7 +55,8 @@ def bench(args):
         out_msg = [bench_file+ ': [seq, par, speedup]']
         tstart = datetime.datetime.now()
         cmd = "LD_LIBRARY_PATH=./libpedsim/:$LD_LIBRARY_PATH ./bench_cache/{}".format(bench_file.split('.')[0])
-        subprocess.check_output(cmd, shell=True)
+        seq_out = subprocess.check_output(cmd, shell=True)
+        print(seq_out)
         delta = datetime.datetime.now() - tstart
         secs = delta.seconds + 24 * 3600 * delta.days + 1e-6 * delta.microseconds
         out_msg.append("%.2f" % secs)
