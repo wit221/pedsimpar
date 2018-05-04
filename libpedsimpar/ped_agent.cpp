@@ -13,6 +13,7 @@
 #include <algorithm>
 //#include <random>
 #include <iostream>
+#include <omp.h>
 
 using namespace std;
 
@@ -441,7 +442,10 @@ Ped::Tvector Ped::Tagent::lookaheadForce(Ped::Tvector e, const set<const Ped::Ta
     int N = neighbors.size();
     int lookforwardcount = 0;
 
-    if (N < 100000) {
+    if (N >= 2000000 && omp_get_thread_num() == 0) {
+        //cerr << id << " " << N << endl;
+        lookforwardcount = cudaLookaheadCount(e, p, v, id, neighbors);
+    } else {
         const double pi = 3.14159265;
         for (set<const Ped::Tagent*>::iterator iter = neighbors.begin(); iter!=neighbors.end(); ++iter) {
             const Ped::Tagent* other = *iter;
@@ -470,9 +474,6 @@ Ped::Tvector Ped::Tagent::lookaheadForce(Ped::Tvector e, const set<const Ped::Ta
                 }
             }
         }
-    } else {
-        //cerr << id << " " << N << endl;
-        lookforwardcount = cudaLookaheadCount(e, p, v, id, neighbors);
     }
     
     Ped::Tvector lf;

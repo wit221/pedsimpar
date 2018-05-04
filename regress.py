@@ -42,34 +42,36 @@ if args.n <= 0 or args.n > 100000:
     sys.exit(0)
 
 print("[.] making libraries")
-subprocess.check_output(["make"], cwd="./libpedsim")
-subprocess.check_output(["make"], cwd="./libpedsimpar")
+subprocess.check_call(["make"], cwd="./libpedsim")
+subprocess.check_call(["make"], cwd="./libpedsimpar")
 
 print("[.] making test executables")
-subprocess.check_output("g++ ./regress/regress.cpp -o regress/regress_seq -Ilibpedsim -lpedsim -Llibpedsim -g -std=c++0x", shell=True)
+subprocess.check_call("g++ ./regress/regress.cpp -o regress/regress_seq -Ilibpedsim -lpedsim -Llibpedsim -g -std=c++0x", shell=True)
 if os.path.exists("/opt/cuda-8.0/"):
     cudalib = "-L/opt/cuda-8.0/lib64/ -lcudart"
+    cudalibdir = "/opt/cuda-8.0/lib64/"
 else:
     cudalib = "-L/usr/local/depot/cuda-8.0/lib64/ -lcudart"
-subprocess.check_output("g++ ./regress/regress.cpp -o regress/regress_par -Ilibpedsimpar -lpedsimpar -Llibpedsimpar {} -g -std=c++0x".format(cudalib), shell=True)
+    cudalibdir = "/usr/local/depot/cuda-8.0/lib64/"
+subprocess.check_call("g++ ./regress/regress.cpp -o regress/regress_par -Ilibpedsimpar -lpedsimpar -Llibpedsimpar {0} -g -std=c++0x".format(cudalib), shell=True)
 
 print("[.] running parallel")
 start = time.time()
-subprocess.check_output("LD_LIBRARY_PATH=./libpedsimpar/:${{LD_LIBRARY_PATH}} ./regress/regress_par -n {} -t {} {}".format(args.n, args.t, "-q" if args.q else ""), shell=True)
-subprocess.check_output("mv ./pedsim_out.txt ./pedsim_out_par.txt", shell=True)
+subprocess.check_call("LD_LIBRARY_PATH={3}:./libpedsimpar/:${{LD_LIBRARY_PATH}} ./regress/regress_par -n {0} -t {1} {2}".format(args.n, args.t, "-q" if args.q else "", cudalibdir), shell=True)
+subprocess.check_call("mv ./pedsim_out.txt ./pedsim_out_par.txt", shell=True)
 end = time.time()
 partime = end-start
-print("Parallel:   {} ms".format(partime*1000.0))
+print("Parallel:   {0} ms".format(partime*1000.0))
 
 print("[.] running sequential")
 start = time.time()
-subprocess.check_output("LD_LIBRARY_PATH=./libpedsim/:${{LD_LIBRARY_PATH}} ./regress/regress_seq -n {} -t {} {}".format(args.n, args.t, "-q" if args.q else ""), shell=True)
-subprocess.check_output("mv ./pedsim_out.txt ./pedsim_out_seq.txt", shell=True)
+subprocess.check_call("LD_LIBRARY_PATH=./libpedsim/:${{LD_LIBRARY_PATH}} ./regress/regress_seq -n {0} -t {1} {2}".format(args.n, args.t, "-q" if args.q else ""), shell=True)
+subprocess.check_call("mv ./pedsim_out.txt ./pedsim_out_seq.txt", shell=True)
 end = time.time()
 seqtime = end-start
-print("Sequential: {} ms".format(seqtime*1000.0))
+print("Sequential: {0} ms".format(seqtime*1000.0))
 
-print("Speedup: {}".format(seqtime/partime))
+print("Speedup: {0}".format(seqtime/partime))
 
 print("[.] checking output")
 
