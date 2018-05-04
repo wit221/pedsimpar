@@ -2,6 +2,7 @@
 // pedsim - A microscopic pedestrian simulation system.
 // Copyright (c) by Christian Gloor
 //
+#include <mpi.h>
 
 #include "ped_scene.h"
 #include "ped_agent.h"
@@ -33,8 +34,9 @@ Ped::Tscene::Tscene() : tree(NULL), timestep(0) {};
 /// \param top is the upper side of the boundary
 /// \param width is the total width of the boundary. Basically from left to right.
 /// \param height is the total height of the boundary. Basically from top to down.
-Ped::Tscene::Tscene(double left, double top, double width, double height,
-                    int iters, int h) : Tscene() {
+
+Ped::Tscene::Tscene(double left, double top, double width, double height) : Tscene() {
+  //,int iters, int h
     tree = new Ped::Ttree(this, 0, left, top, width, height);
 }
 

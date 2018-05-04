@@ -96,7 +96,7 @@ namespace Ped {
     protected:
         int process_id;
         int nprocess;
-        
+
         vector<Tagent*> agents;
         vector<Tobstacle*> obstacles;
         vector<Twaypoint*> waypoints;

@@ -13,16 +13,23 @@
 using namespace std;
 
 int main(int argc, char *argv[]) {
+    MPI_Init(NULL, NULL);
+    inr nprocess, process_id;
 
-    // create an output writer which will send output to a file 
+    MPI_Comm_size(MPI_COMM_WORLD, &nprocess);
+    MPI_Comm_rank(MPI_COMM_WORLD, &process_id);
+
+    if (process_id == 0){
+    // create an output writer which will send output to a file
     Ped::OutputWriter *ow = new Ped::FileOutputWriter();
     ow->setScenarioName("Example 01");
 
     cout << "PedSim Example using libpedsim version " << Ped::LIBPEDSIM_VERSION << endl;
-
+    }
     // Setup
-    Ped::Tscene *pedscene = new Ped::Tscene(-200, -200, 400, 400);
+    Ped::Tsuperscene *pedscene = new Ped::Tsuperscene(-200, -200, 400, 400, 700, 0.3);
 
+    if (process_id==0){
     pedscene->setOutputWriter(ow);
 
     Ped::Twaypoint *w1 = new Ped::Twaypoint(-100, 0, 24);
@@ -39,14 +46,10 @@ int main(int argc, char *argv[]) {
 
         a->setPosition(-50 + rand()/(RAND_MAX/80)-40, 0 + rand()/(RAND_MAX/20) -10, 0);
 
-        pedscene->addAgent(a);
+        pedsuperscene->addAgent(a);
     }
-
-    // Move all agents for 700 steps (and write their position through the outputwriter)
-    for (int i=0; i<700; ++i) {
-        pedscene->moveAgents(0.3);
-	std::this_thread::sleep_for(std::chrono::milliseconds(3));
-    }
+  }
+  ped_scene.startSim();
 
     // Cleanup
     for (Ped::Tagent* agent : pedscene->getAllAgents()) delete agent;
