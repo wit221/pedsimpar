@@ -21,7 +21,7 @@ def usage():
 
 try:
     opts, _ = getopt.getopt(sys.argv[1:], "hn:t:q", ["help"])
-except getopt.GetopotError as err:
+except getopt.GetoptError as err:
     print(str(err))
     usage()
     sys.exit(2)
