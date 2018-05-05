@@ -178,10 +178,14 @@ void Ped::Tscene::moveAgents(double h) {
         // similar to n-body
         int N = agents.size();
         vector<int> counts(N);
+        #pragma omp parallel for
+        for (int i = 0; i < agents.size(); i++) {
+            agents[i]->computeForcesCudaDesired();
+        }
         cudaLookaheadCount(agents, counts); // TODO now actually use counts?
         #pragma omp parallel for
         for (int i = 0; i < agents.size(); i++) {
-            agents[i]->computeForcesCuda(counts[i]);
+            agents[i]->computeForcesCudaRest(counts[i]);
         }
     } else {
         #pragma omp parallel for

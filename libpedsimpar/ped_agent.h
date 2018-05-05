@@ -103,8 +103,8 @@ namespace Ped {
             BEHAVIOR_ONCE = 1
         };
 
-        void computeForcesCuda(int count);
-
+        void computeForcesCudaDesired();
+        void computeForcesCudaRest(int count);
 
     protected:
         int id;                                           ///< agent number

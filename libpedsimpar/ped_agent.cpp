@@ -510,11 +510,11 @@ void Ped::Tagent::computeForces() {
     myforce = myForce(desiredDirection, neighbors);
 }
 
-void Ped::Tagent::computeForcesCuda(int lookaheadcount) {
-    const double neighborhoodRange = 20.0;
-    auto neighbors = scene->getNeighbors(p.x, p.y, neighborhoodRange);
-
+void Ped::Tagent::computeForcesCudaDesired() {
     desiredforce = desiredForce(); // TODO when should this be called/updated? this updates desiredDirection as well
+}
+
+void Ped::Tagent::computeForcesCudaRest(int lookaheadcount) {
     if (factorlookaheadforce > 0) {
         if (lookaheadcount < 0) {
             lookaheadforce.x = 0.5f *  desiredDirection.y;
@@ -527,11 +527,12 @@ void Ped::Tagent::computeForcesCuda(int lookaheadcount) {
             lookaheadforce.y = 0;
         }
     }
+    const double neighborhoodRange = 20.0;
+    auto neighbors = scene->getNeighbors(p.x, p.y, neighborhoodRange);
     if (factorsocialforce > 0) socialforce = socialForce(neighbors);
     if (factorobstacleforce > 0) obstacleforce = obstacleForce(neighbors);
     myforce = myForce(desiredDirection, neighbors);
 }
-
 
 /// Does the agent dynamics stuff. In the current implementation a
 /// simple Euler integration is used. As the first step, the new
