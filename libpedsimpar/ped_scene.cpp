@@ -213,6 +213,7 @@ void Ped::Tscene::moveAgents(double h) {
 
     // then move agents according to their forces
 <<<<<<< HEAD
+<<<<<<< HEAD
     #pragma omp parallel for schedule(static)
     for (int i = 0; i< num_agents; i++) {
       agents[i]->move(h);
@@ -223,6 +224,12 @@ void Ped::Tscene::moveAgents(double h) {
       moveAgent(*agent);
     }
 
+=======
+    #pragma omp parallel for
+    for (auto agent = agents.begin(); agent < agents.end(); agent++) {
+        (*agent)->move(h);
+    }
+>>>>>>> parent of dbc1be0... dynamic scheduloing, speedup: 8-> 9
 =======
     #pragma omp parallel for
     for (auto agent = agents.begin(); agent < agents.end(); agent++) {
