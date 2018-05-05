@@ -78,6 +78,7 @@ namespace Ped {
         Tvector getPosition() const { return p; }
         Tvector getVelocity() const { return v; }
         Tvector getAcceleration() const { return a; }
+        Tvector getDesiredDirection() const { return desiredDirection; }
 
         void setfactorsocialforce(double f);
         void setfactorobstacleforce(double f);
@@ -101,6 +102,8 @@ namespace Ped {
             BEHAVIOR_CIRCULAR = 0,
             BEHAVIOR_ONCE = 1
         };
+
+        void computeForcesCuda();
 
 
     protected:

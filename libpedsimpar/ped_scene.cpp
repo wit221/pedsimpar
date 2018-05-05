@@ -9,6 +9,7 @@
 #include "ped_tree.h"
 #include "ped_waypoint.h"
 #include "ped_outputwriter.h"
+#include "forces.cuh"
 
 #include <cstddef>
 #include <algorithm>
@@ -172,9 +173,21 @@ void Ped::Tscene::moveAgents(double h) {
     timestep++;
 
     // first update forces
-    #pragma omp parallel for
-    for (auto agent = agents.begin(); agent < agents.end(); agent++) {
-        (*agent)->computeForces();
+    if (tree == NULL) {
+        // bulk update with cuda
+        // similar to n-body
+        int N = agents.size();
+        vector<int> counts(N);
+        cudaLookaheadCount(agents, counts);
+        #pragma omp parallel for
+        for (auto agent = agents.begin(); agent < agents.end(); agent++) {
+            (*agent)->computeForcesCuda();
+        }
+    } else {
+        #pragma omp parallel for
+        for (auto agent = agents.begin(); agent < agents.end(); agent++) {
+            (*agent)->computeForces();
+        }
     }
 
     // then move agents according to their forces

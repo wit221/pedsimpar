@@ -442,7 +442,7 @@ Ped::Tvector Ped::Tagent::lookaheadForce(Ped::Tvector e, const set<const Ped::Ta
     int N = neighbors.size();
     int lookforwardcount = 0;
 
-    if (N >= 2000000 && omp_get_thread_num() == 0) {
+    if (N >= 5000 && omp_get_thread_num() == 0) {
         //cerr << id << " " << N << endl;
         lookforwardcount = cudaLookaheadCount(e, p, v, id, neighbors);
     } else {
@@ -475,7 +475,7 @@ Ped::Tvector Ped::Tagent::lookaheadForce(Ped::Tvector e, const set<const Ped::Ta
             }
         }
     }
-    
+
     Ped::Tvector lf;
     if (lookforwardcount < 0) {
         lf.x = 0.5f *  e.y; // was vx, vy  --chgloor 2012-01-15
@@ -515,6 +515,17 @@ void Ped::Tagent::computeForces() {
     myforce = myForce(desiredDirection, neighbors);
 }
 
+void Ped::Tagent::computeForcesCuda() {
+    const double neighborhoodRange = 20.0;
+    auto neighbors = scene->getNeighbors(p.x, p.y, neighborhoodRange);
+
+    desiredforce = desiredForce();
+    //if (factorlookaheadforce > 0) lookaheadforce = lookaheadForce(desiredDirection, neighbors);
+    if (factorsocialforce > 0) socialforce = socialForce(neighbors);
+    if (factorobstacleforce > 0) obstacleforce = obstacleForce(neighbors);
+    myforce = myForce(desiredDirection, neighbors);
+}
+
 
 /// Does the agent dynamics stuff. In the current implementation a
 /// simple Euler integration is used. As the first step, the new
@@ -523,7 +534,7 @@ void Ped::Tagent::computeForces() {
 /// added to the existing velocity, which again is used during the
 /// next time step. See e.g. https://en.wikipedia.org/wiki/Euler_method
 ///
-/// \date 2003-12-29 
+/// \date 2003-12-29
 /// \param h Integration time step delta t
 void Ped::Tagent::move(double h) {
   // internal position update = actual move
@@ -561,7 +572,7 @@ void Ped::Tagent::move(double h) {
 
   p = p_desired;  // update my position
 
-  
+
   // weighted sum of all forces --> acceleration
   a = factordesiredforce * desiredforce
     + factorsocialforce * socialforce
