@@ -117,7 +117,7 @@ bool Ped::Tscene::removeAgent(Ped::Tagent *a) {
     // remove agent from the tree
     if (tree != NULL)
         tree->removeAgent(a);
-    
+
     // remove agent from the scene, report succesful removal
     agents.erase(it);
 
@@ -145,7 +145,7 @@ bool Ped::Tscene::removeObstacle(Ped::Tobstacle *o) {
 /// Remove a waypoint from the scene.
 /// \warning Used to delete the waypoint. I don't think Tscene has ownership of the assigned objects. Will not delete from now on.
 bool Ped::Tscene::removeWaypoint(Ped::Twaypoint* w) {
-  /* Not sure we want that! 
+  /* Not sure we want that!
     // remove waypoint from all agents
     for(vector<Tagent*>::iterator iter = agents.begin(); iter != agents.end(); ++iter) {
         Tagent *a = (*iter);
@@ -172,16 +172,22 @@ void Ped::Tscene::moveAgents(double h) {
     timestep++;
 
     // first update forces
-    #pragma omp parallel for
+    #pragma omp parallel for schedule(dynamic)
     for (auto agent = agents.begin(); agent < agents.end(); agent++) {
         (*agent)->computeForces();
     }
 
     // then move agents according to their forces
-    #pragma omp parallel for
+    #pragma omp parallel for schedule(dynamic)
     for (auto agent = agents.begin(); agent < agents.end(); agent++) {
         (*agent)->move(h);
     }
+
+    #pragma omp parallel for schedule(dynamic)
+    for (auto agent = agents.begin(); agent < agents.end(); agent++) {
+        moveAgent(*agent);
+    }
+
     // then output their new position if an OutputWriter is given.
 	for (auto ow : outputwriters) {
       ow->writeTimeStep(timestep);

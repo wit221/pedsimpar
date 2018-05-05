@@ -514,7 +514,7 @@ void Ped::Tagent::computeForces() {
 /// added to the existing velocity, which again is used during the
 /// next time step. See e.g. https://en.wikipedia.org/wiki/Euler_method
 ///
-/// \date 2003-12-29 
+/// \date 2003-12-29
 /// \param h Integration time step delta t
 void Ped::Tagent::move(double h) {
   // internal position update = actual move
@@ -552,7 +552,7 @@ void Ped::Tagent::move(double h) {
 
   p = p_desired;  // update my position
 
-  
+
   // weighted sum of all forces --> acceleration
   a = factordesiredforce * desiredforce
     + factorsocialforce * socialforce
@@ -567,5 +567,5 @@ void Ped::Tagent::move(double h) {
   if (v.length() > vmax) v = v.normalized() * vmax;
 
   // notice scene of movement
-  scene->moveAgent(this);
+  // scene->moveAgent(this);
 }
