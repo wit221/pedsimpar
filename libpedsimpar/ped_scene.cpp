@@ -176,9 +176,10 @@ void Ped::Tscene::moveAgents(double h) {
     for (auto agent = agents.begin(); agent < agents.end(); agent++) {
         (*agent)->computeForces();
     }
+    const double neighborhoodRange = 20.0;
 
     // then move agents according to their forces
-    #pragma omp parallel for schedule(dynamic)
+    #pragma omp parallel for schedule(static)
     for (auto agent = agents.begin(); agent < agents.end(); agent++) {
         (*agent)->move(h);
     }

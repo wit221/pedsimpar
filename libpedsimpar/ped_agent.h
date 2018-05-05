@@ -32,7 +32,10 @@
 #include <set>
 #include <vector>
 #include <cstdio>
-
+#include <cstddef>
+#include <algorithm>
+#include <stack>
+#include <list>
 using namespace std;
 
 EXPIMP_TEMPLATE template class LIBEXPORT std::deque<Ped::Twaypoint*>;
@@ -102,10 +105,13 @@ namespace Ped {
             BEHAVIOR_ONCE = 1
         };
 
-
-    protected:
-        int id;                                           ///< agent number
         Tvector p;                                        ///< current position of the agent
+        double factordesiredforce;
+        double factorsocialforce;
+        double factorobstacleforce;
+        double factorlookaheadforce;
+
+        int id;                                           ///< agent number
         Tvector v;                                        ///< velocity of the agent
         Tvector a;                                        ///< current acceleration of the agent
         int type;
@@ -123,10 +129,6 @@ namespace Ped {
 
         bool mlLookAhead;
 
-        double factordesiredforce;
-        double factorsocialforce;
-        double factorobstacleforce;
-        double factorlookaheadforce;
 
         double obstacleForceSigma;
 
@@ -143,6 +145,10 @@ namespace Ped {
 	//        set<const Ped::Tagent*> neighbors;
 
         long timestep;
+
+        std::list<const Ped::Tagent*> neighborList;
+
+      protected:
     };
 }
 #endif

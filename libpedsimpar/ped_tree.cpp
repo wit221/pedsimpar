@@ -82,7 +82,7 @@ void Ped::Ttree::addAgent(const Ped::Tagent *a) {
     else if ((pos.x >= x+w/2) && (pos.y <= y+h/2)) tree2->addAgent(a); // 2
     else if ((pos.x <= x+w/2) && (pos.y >= y+h/2)) tree4->addAgent(a); // 4
   }
-  
+
   if (agents.size() > 8) {
     isleaf = false;
     addChildren();
@@ -179,22 +179,22 @@ void Ped::Ttree::moveAgent(const Ped::Tagent *a) {
     agents.erase(a);
     omp_unset_nest_lock(const_cast<omp_nest_lock_t*>(&lock));
     scene->placeAgent(a);
-  } else {
+  }
+   else {
     omp_unset_nest_lock(const_cast<omp_nest_lock_t*>(&lock));
   }
 }
 
 
 bool Ped::Ttree::removeAgent(const Ped::Tagent *a) {
-  omp_set_nest_lock(const_cast<omp_nest_lock_t*>(&lock));
   if(isleaf) {
+    omp_set_nest_lock(const_cast<omp_nest_lock_t*>(&lock));
     size_t removedCount = agents.erase(a);
     omp_unset_nest_lock(const_cast<omp_nest_lock_t*>(&lock));
     return (removedCount > 0);
   }
   else {
     const Tvector pos = a->getPosition();
-    omp_unset_nest_lock(const_cast<omp_nest_lock_t*>(&lock));
     return getChildByPosition(pos.x, pos.y)->removeAgent(a);
   }
 }
@@ -206,13 +206,13 @@ bool Ped::Ttree::removeAgent(const Ped::Tagent *a) {
 /// \date    2012-01-28
 /// \return  the number of agents in this and all child nodes.
 int Ped::Ttree::cut() {
-    omp_set_nest_lock(const_cast<omp_nest_lock_t*>(&lock));
     int count = 0;
     if (isleaf) {
-        omp_unset_nest_lock(const_cast<omp_nest_lock_t*>(&lock));
+        // omp_unset_nest_lock(const_cast<omp_nest_lock_t*>(&lock));
         return agents.size();
     }
 
+    omp_set_nest_lock(const_cast<omp_nest_lock_t*>(&lock));
 
     count += tree1->cut();
     count += tree2->cut();
@@ -248,7 +248,7 @@ int Ped::Ttree::cut() {
 /// \return  The set of agents
 /// \todo This might be not very efficient, since all childs are checked, too. And then the set (set of pointer, but still) is being copied around.
 set<const Ped::Tagent*> Ped::Ttree::getAgents() const {
-    omp_set_nest_lock(const_cast<omp_nest_lock_t*>(&lock));
+  omp_set_nest_lock(const_cast<omp_nest_lock_t*>(&lock));
     if (isleaf) {
         omp_unset_nest_lock(const_cast<omp_nest_lock_t*>(&lock));
         return agents;
