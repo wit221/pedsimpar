@@ -466,7 +466,6 @@ Ped::Tvector Ped::Tagent::lookaheadForce(Ped::Tvector e, const set<const Ped::Ta
             }
         }
     }
-
     Ped::Tvector lf;
     if (lookforwardcount < 0) {
         lf.x = 0.5f *  e.y; // was vx, vy  --chgloor 2012-01-15
