@@ -442,36 +442,31 @@ Ped::Tvector Ped::Tagent::lookaheadForce(Ped::Tvector e, const set<const Ped::Ta
     int N = neighbors.size();
     int lookforwardcount = 0;
 
-    if (N >= 5000 && omp_get_thread_num() == 0) {
-        //cerr << id << " " << N << endl;
-        lookforwardcount = cudaLookaheadCount(e, p, v, id, neighbors);
-    } else {
-        const double pi = 3.14159265;
-        for (set<const Ped::Tagent*>::iterator iter = neighbors.begin(); iter!=neighbors.end(); ++iter) {
-            const Ped::Tagent* other = *iter;
+    const double pi = 3.14159265;
+    for (set<const Ped::Tagent*>::iterator iter = neighbors.begin(); iter!=neighbors.end(); ++iter) {
+        const Ped::Tagent* other = *iter;
 
-            // don't compute this force for the agent himself
-            if (other->id == id) continue;
+        // don't compute this force for the agent himself
+        if (other->id == id) continue;
 
-            double distancex = other->p.x - p.x;
-            double distancey = other->p.y - p.y;
-            double dist2 = (distancex * distancex + distancey * distancey); // 2D
-            if (dist2 < 400) { // look ahead feature
-                double at2v = atan2(-e.x, -e.y); // was vx, vy  --chgloor 2012-01-15
-                double at2d = atan2(-distancex, -distancey);
-                double at2v2 = atan2(-other->v.x, -other->v.y);
-                double s = at2d - at2v;
-                if (s > pi) s -= 2*pi;
-                if (s < -pi) s += 2*pi;
-                double vv = at2v - at2v2;
-                if (vv > pi) vv -= 2*pi;
-                if (vv < -pi) vv += 2*pi;
-                if (abs(vv) > 2.5) { // opposite direction
-                    if ((s < 0) && (s > -0.3)) // position vor mir, in meine richtung
-                        lookforwardcount--;
-                    if ((s > 0) && (s < 0.3))
-                        lookforwardcount++;
-                }
+        double distancex = other->p.x - p.x;
+        double distancey = other->p.y - p.y;
+        double dist2 = (distancex * distancex + distancey * distancey); // 2D
+        if (dist2 < 400) { // look ahead feature
+            double at2v = atan2(-e.x, -e.y); // was vx, vy  --chgloor 2012-01-15
+            double at2d = atan2(-distancex, -distancey);
+            double at2v2 = atan2(-other->v.x, -other->v.y);
+            double s = at2d - at2v;
+            if (s > pi) s -= 2*pi;
+            if (s < -pi) s += 2*pi;
+            double vv = at2v - at2v2;
+            if (vv > pi) vv -= 2*pi;
+            if (vv < -pi) vv += 2*pi;
+            if (abs(vv) > 2.5) { // opposite direction
+                if ((s < 0) && (s > -0.3)) // position vor mir, in meine richtung
+                    lookforwardcount--;
+                if ((s > 0) && (s < 0.3))
+                    lookforwardcount++;
             }
         }
     }
@@ -515,12 +510,23 @@ void Ped::Tagent::computeForces() {
     myforce = myForce(desiredDirection, neighbors);
 }
 
-void Ped::Tagent::computeForcesCuda() {
+void Ped::Tagent::computeForcesCuda(int lookaheadcount) {
     const double neighborhoodRange = 20.0;
     auto neighbors = scene->getNeighbors(p.x, p.y, neighborhoodRange);
 
-    desiredforce = desiredForce();
-    //if (factorlookaheadforce > 0) lookaheadforce = lookaheadForce(desiredDirection, neighbors);
+    desiredforce = desiredForce(); // TODO when should this be called/updated? this updates desiredDirection as well
+    if (factorlookaheadforce > 0) {
+        if (lookaheadcount < 0) {
+            lookaheadforce.x = 0.5f *  desiredDirection.y;
+            lookaheadforce.y = 0.5f * -desiredDirection.x;
+        } else if (lookaheadcount > 0) {
+            lookaheadforce.x = 0.5f * -desiredDirection.y;
+            lookaheadforce.y = 0.5f *  desiredDirection.x;
+        } else {
+            lookaheadforce.x = 0;
+            lookaheadforce.y = 0;
+        }
+    }
     if (factorsocialforce > 0) socialforce = socialForce(neighbors);
     if (factorobstacleforce > 0) obstacleforce = obstacleForce(neighbors);
     myforce = myForce(desiredDirection, neighbors);

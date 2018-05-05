@@ -1,6 +1,7 @@
 #include "ped_agent.h"
 #include "ped_vector.h"
 #include <thrust/device_vector.h>
+#include <thrust/fill.h>
 
 __global__ void kernelLookahead(double2 *e, double2 *p, double2 *v, int* tmp, int* count, int N) {
     // compute lookahead counts
@@ -47,18 +48,18 @@ __global__ void kernelLookahead(double2 *e, double2 *p, double2 *v, int* tmp, in
     count[me] = total;
 }
 
-void cudaLookaheadCount(const vector<Ped::Tagent*> &agents, vector<int> &counts) {
+void cudaLookaheadCount(vector<Ped::Tagent*> &agents, vector<int> &counts) {
     int N = agents.size();
     thrust::host_vector<double2> pvec_host(N);
     thrust::host_vector<double2> vvec_host(N);
     thrust::host_vector<double2> evec_host(N);
 
     thrust::device_vector<int> tmpvec(N*N);
-    thrust::fill(thrust::device, tmpvec.begin(), tmpvec.end(), 0);
+    thrust::fill(tmpvec.begin(), tmpvec.end(), 0);
     thrust::device_vector<int> countvec(N);
 
     int i = 0;
-    for (auto iter = agents.begin(); iter!=agents.end(); ++iter) {
+    for (std::vector<Ped::Tagent*>::iterator iter = agents.begin(); iter!=agents.end(); ++iter) {
         const Ped::Tagent* agent = *iter;
         Ped::Tvector op = agent->getPosition();
         Ped::Tvector ov = agent->getVelocity();
@@ -93,5 +94,5 @@ void cudaLookaheadCount(const vector<Ped::Tagent*> &agents, vector<int> &counts)
         cerr << endl;
     }*/
 
-    return 0;
+    return;
 }

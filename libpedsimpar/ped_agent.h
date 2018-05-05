@@ -103,7 +103,7 @@ namespace Ped {
             BEHAVIOR_ONCE = 1
         };
 
-        void computeForcesCuda();
+        void computeForcesCuda(int count);
 
 
     protected:
