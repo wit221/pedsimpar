@@ -32,8 +32,7 @@ Ped::Tsuperscene::Tsuperscene(double left, double top, double width, double heig
   double my_height = height/process_count;
   double my_top = my_height*process_id;
   //create scene
-  Tscene s = new Tscene(left, my_top, width, my_height);
-
+  s = new Tscene(left, my_top, width, my_height);
 }
 
 /// \param   *a A pointer to the Tagent to add.
@@ -51,6 +50,9 @@ void Ped::Tsuperscene::addObstacle(Ped::Tobstacle *o) {
     // for now, just add the obstacle
     s->addObstacle(o);
 }
-void Ped::Tscene::addWaypoint(Ped::Twaypoint* w) {
+void Ped::Tsuperscene::addWaypoint(Ped::Twaypoint* w) {
   s->addWaypoint(w);
+}
+void Ped::Tsuperscene::startSim(int iters, double h){
+  s->startSim(iters, h);
 }

@@ -1,6 +1,6 @@
 CXX = mpic++
 CXXFLAGS = -g -O2 -fno-inline -std=c++0x -fopenmp -fPIC
-CXXFILES = ped_vector.cpp ped_outputwriter.cpp ped_superscene.cpp ped_scene.cpp ped_tree.cpp ped_obstacle.cpp ped_waypoint.cpp ped_agent.cpp
+CXXFILES = ped_vector.cpp ped_outputwriter.cpp ped_scene.cpp ped_tree.cpp ped_obstacle.cpp ped_waypoint.cpp ped_agent.cpp
 OFILES = $(CXXFILES:.cpp=.o)
 
 all: libpedsimpar.so
@@ -9,7 +9,7 @@ libpedsimpar.so:
 	$(CXX) $(CXXFLAGS) -fPIC -c ped_vector.cpp -o ped_vector.o
 	$(CXX) $(CXXFLAGS) -fPIC -c ped_outputwriter.cpp -o ped_outputwriter.o
 	$(CXX) $(CXXFLAGS) -fPIC -c ped_scene.cpp -o ped_scene.o
-	$(CXX) $(CXXFLAGS) -fPIC -c ped_superscene.cpp -o ped_superscene.o
+	# $(CXX) $(CXXFLAGS) -fPIC -c ped_superscene.cpp -o ped_superscene.o
 	$(CXX) $(CXXFLAGS) -fPIC -c ped_tree.cpp -o ped_tree.o
 	$(CXX) $(CXXFLAGS) -fPIC -c ped_obstacle.cpp -o ped_obstacle.o
 	$(CXX) $(CXXFLAGS) -fPIC -c ped_waypoint.cpp -o ped_waypoint.o

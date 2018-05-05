@@ -13,23 +13,24 @@
 using namespace std;
 
 int main(int argc, char *argv[]) {
-    MPI_Init(NULL, NULL);
-    inr nprocess, process_id;
-
-    MPI_Comm_size(MPI_COMM_WORLD, &nprocess);
-    MPI_Comm_rank(MPI_COMM_WORLD, &process_id);
-
-    if (process_id == 0){
+    // MPI_Init(NULL, NULL);
+    // inr nprocess, process_id;
+    //
+    // MPI_Comm_size(MPI_COMM_WORLD, &nprocess);
+    // MPI_Comm_rank(MPI_COMM_WORLD, &process_id);
+    //
+    // if (process_id == 0){
     // create an output writer which will send output to a file
     Ped::OutputWriter *ow = new Ped::FileOutputWriter();
     ow->setScenarioName("Example 01");
 
     cout << "PedSim Example using libpedsim version " << Ped::LIBPEDSIM_VERSION << endl;
-    }
+    // }
     // Setup
-    Ped::Tsuperscene *pedscene = new Ped::Tsuperscene(-200, -200, 400, 400, 700, 0.3);
+    // Ped::Tsuperscene *pedscene = new Ped::Tsuperscene(-200, -200, 400, 400, 700, 0.3);
+    Ped::Tscene *pedscene = new Ped::Tscene();
 
-    if (process_id==0){
+    // if (process_id==0){
     pedscene->setOutputWriter(ow);
 
     Ped::Twaypoint *w1 = new Ped::Twaypoint(-100, 0, 24);
@@ -46,10 +47,10 @@ int main(int argc, char *argv[]) {
 
         a->setPosition(-50 + rand()/(RAND_MAX/80)-40, 0 + rand()/(RAND_MAX/20) -10, 0);
 
-        pedsuperscene->addAgent(a);
+        pedscene->addAgent(a);
     }
-  }
-  ped_scene.startSim();
+  // }
+  // ped_scene.startSim();
 
     // Cleanup
     for (Ped::Tagent* agent : pedscene->getAllAgents()) delete agent;

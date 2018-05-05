@@ -15,6 +15,17 @@
   -dealing with MPI and OOP:
     - example and superscenee should run on one thread. The remainign scenes
     should each run on its own thread.
+challenges:
+
+- obstacles are not points, but edges. Hence, some obstacles may be spanning multiple processors.
+- the eyesight of the agent is too big cause overlaps processors -> agent may need to see
+all agents on all processors...
+- cannot assume that communication goes to only a given processor -> agent may
+move to any processor. Hence, comm can be up to all processors at each frame.
+Hence:
+  - after each frame, each processor sends its own agents to all processrs,
+  updates its owned agents vector based on boundaries
+
 
 - not using quad tree:
   -divide by hrizontal bands

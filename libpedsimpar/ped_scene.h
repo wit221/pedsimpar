@@ -98,8 +98,11 @@ namespace Ped {
         int nprocess;
 
         vector<Tagent*> agents;
+        vector<Tagent*> alienAgents;
+
         vector<Tobstacle*> obstacles;
         vector<Twaypoint*> waypoints;
+
         Ttree *tree;
 
         long int timestep;

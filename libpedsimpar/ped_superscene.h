@@ -57,6 +57,7 @@ class LIBEXPORT Tsuperscene {
         virtual void moveAgents(double h);
 
     protected:
+        Tscene s;
         int process_id;
         int nprocess;
         int iters;

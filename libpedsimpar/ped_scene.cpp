@@ -162,6 +162,12 @@ bool Ped::Tscene::removeWaypoint(Ped::Twaypoint* w) {
     return true;
 }
 
+void Ped::Tscene::startSim(int iter, double h){
+  for (int i = 0; i<iter; i++){
+    moveAgents(h)
+  }
+}
+
 
 /// This is a convenience method. It calls Ped::Tagent::move(double h) for all agents in the Tscene.
 /// \date    2012-02-03
@@ -172,13 +178,14 @@ void Ped::Tscene::moveAgents(double h) {
     timestep++;
 
     // first update forces
-    #pragma omp parallel for schedule(dynamic)
     for (auto agent = agents.begin(); agent < agents.end(); agent++) {
         (*agent)->computeForces();
     }
+    //no communication here
+    //get new positions based on forces
+
 
     // then move agents according to their forces
-    // #pragma omp parallel for schedule(dynamic)
     for (auto agent = agents.begin(); agent < agents.end(); agent++){
       (*agent)->move(h);
     }
