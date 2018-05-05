@@ -8,12 +8,12 @@ all: libpedsimpar.so
 libpedsimpar.so: $(OFILES)
 	$(CXX) $(CXXFLAGS) -shared -Wl,-soname,libpedsimpar.so -o libpedsimpar.so $(OFILES)
 
-examples: libpedsimpar.so examples/example*.cpp
-	g++ examples/example01.cpp -o example01 -I. -lpedsimpar -L. -g -std=c++0x
-	g++ examples/example02.cpp -o example02 -I. -lpedsimpar -L. -g -std=c++0x
-	g++ examples/example03.cpp -o example03 -I. -lpedsimpar -L. -g -std=c++0x
-	g++ examples/example04.cpp -o example04 -I. -lpedsimpar -L. -g -std=c++0x
-	g++ examples/example05.cpp -o example05 -I. -lpedsimpar -L. -g -std=c++0x
+examples: libpedsim.so examples/example*.cpp
+	g++ examples/example01.cpp -o example01 -I. -lpedsim -L. -g -std=c++0x
+	g++ examples/example02.cpp -o example02 -I. -lpedsim -L. -g -std=c++0x
+	g++ examples/example03.cpp -o example03 -I. -lpedsim -L. -g -std=c++0x
+	g++ examples/example04.cpp -o example04 -I. -lpedsim -L. -g -std=c++0x
+	g++ examples/example05.cpp -o example05 -I. -lpedsim -L. -g -std=c++0x
 
 doc: documentation/doxygen.conf
 	doxygen documentation/doxygen.conf
