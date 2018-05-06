@@ -1,66 +1,74 @@
-// pedsim - A microscopic pedestrian simulation system.
-// Copyright (c) by Christian Gloor
-
 #include "ped_includes.h"
 
 #include <iostream>
-#include <cstdlib> // rand
+#include <sstream>
+#include <cstdlib>
 
 using namespace std;
 
+
+int random(int min, int max) //range : [min, max)
+{
+   static bool first = true;
+   if (first)
+   {
+      srand( time(NULL) ); //seeding for the first time only!
+      first = false;
+   }
+   return min + rand() % (( max + 1 ) - min);
+}
+
 int main(int argc, char *argv[]) {
 
-    /// New class that inherits from the library agent class.  It shows how the
-    /// myForce() method can be used to add an additional force component to an
-    /// agent to change its behaviour.
-    class Tagent2: public Ped::Tagent {
-    public:
-        Ped::Tvector myForce(Ped::Tvector e, const set<const Ped::Tagent*> &neighbors) {
-            Ped::Tvector lf;
-            lf = -100.0*e;
-            return lf;
-        }
-    };
+  cout << "# Benchmark 02 " << Ped::LIBPEDSIM_VERSION << endl;
 
+  //sim params
+  int width;
+  int height;
 
-    cout << "PedSim Example using libpedsim version " << Ped::LIBPEDSIM_VERSION << endl;
+  int num_waypoints = 2;
+  int num_agents = 100;
+  int num_obstacles = 1;
+  int num_iter = 1000;
+  double h = 0.4;
 
-    // setup
-    Ped::Tscene *pedscene = new Ped::Tscene(-200, -200, 400, 400);
+  // create scene
+  Ped::Tscene *pedscene = new Ped::Tscene(0, width, 0, height); // no quadtree
 
-    Ped::Twaypoint *w1 = new Ped::Twaypoint(-100, 0, 24);
-    Ped::Twaypoint *w2 = new Ped::Twaypoint(+100, 0, 12);
+  //create and add obstacles
+  for (int o = 0; o< num_obstacles; o++){
+    obstacles[o] = new Ped::Tobstacle(random(0, width), random(0, height),
+     random(0, width), random(0, height));
+    pedscene->addObstacle(obstacles[o]);
+  }
 
-    Ped::Tobstacle *o = new Ped::Tobstacle(0, -50,  0, +50);
-    pedscene->addObstacle(o);
+  //create waypoints
+  Ped::Twaypoint* waypoints [num_waypoints];
+  for (int w = 0; w<num_waypoints; w++){
+    waypoints[w] = new Ped::Twaypoint(random(0, width), random(0, height), random(5, 25));
+  }
 
-    int nagents = 500;
-
-    for (int i = 0; i<nagents; i++) {
-        Ped::Tagent *a = new Tagent2();
-
-        a->addWaypoint(w1);
-        a->addWaypoint(w2);
-
-        a->setPosition(-50 + rand()/(RAND_MAX/80.0)-40, 0 + rand()/(RAND_MAX/20.0) -10, 0);
-
-        pedscene->addAgent(a);
+  //create agents
+  for (int a = 0; a<num_agents; a++){
+    Ped::Tagent *a = new Ped::Tagent();
+    for (int w = 0; w<num_waypoints; w++){
+      a->addWaypoint(waypoints[w]);
     }
+    a->setPosition(random(0, width), random(0, height), 0);
+    pedscene->addAgent(a);
+  }
 
-    // move all agents for 200 steps
-    for (int i=0; i<200; ++i) {
-        pedscene->moveAgents(0.2);
-    }
+  //make simulation
+  for (int step = 0; step<iters; step++){
+    pedscene->moveAgents(h);
+  }
+}
 
-    // cleanup
-    const vector<Ped::Tagent*>& myagents = pedscene->getAllAgents();
-    for (vector<Ped::Tagent*>::const_iterator iter = myagents.begin(); iter != myagents.end(); ++iter) {
-        delete *iter;
-    }
-    delete pedscene;
-    delete w1;
-    delete w2;
-    delete o;
+  // cleanup
+  for (auto a : pedscene->getAllAgents()) { delete a; };
+  for (auto w : pedscene->getAllWaypoints()) { delete w; };
+  for (auto o : pedscene->getAllObstacles()) { delete o; };
+  delete pedscene;
 
-    return EXIT_SUCCESS;
+  return EXIT_SUCCESS;
 }
