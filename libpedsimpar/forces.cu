@@ -85,6 +85,8 @@ void cudaLookaheadCount(vector<Ped::Tagent*> &agents, vector<int> &counts) {
         N
     );
 
+    thrust::copy(countvec.begin(), countvec.end(), counts.begin());
+
     /*if (id == 7) {
         cerr << "cuda:";
         for (int i = 0; i < N; i++) {
