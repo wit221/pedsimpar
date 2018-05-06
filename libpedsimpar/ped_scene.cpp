@@ -171,22 +171,67 @@ void Ped::Tscene::moveAgents(double h) {
     // update timestep
     timestep++;
 
-    // first update forces
-    #pragma omp parallel for schedule(dynamic)
-    for (auto agent = agents.begin(); agent < agents.end(); agent++) {
-        (*agent)->computeForces();
-    }
 
-    // then move agents according to their forces
-    #pragma omp parallel for schedule(dynamic)
-    for (auto agent = agents.begin(); agent < agents.end(); agent++) {
-        (*agent)->move(h);
-    }
 
-    #pragma omp parallel for schedule(dynamic)
-    for (auto agent = agents.begin(); agent < agents.end(); agent++) {
-        moveAgent(*agent);
-    }
+int num_agents = agents.size();
+set<const Ped::Tagent*> agentNeighbors [num_agents];
+const double neighborhoodRange = 20.0;
+#pragma omp parallel for schedule(dynamic)
+for(int i = 0; i< num_agents; i++) {
+  agentNeighbors[i] = getNeighbors(agents[i]->p.x, agents[i]->p.y, neighborhoodRange);
+}
+#pragma omp parallel for schedule(static)
+for (int i = 0; i< num_agents; i++) {
+  agents[i]->desiredforce = agents[i]->desiredForce();
+}
+#pragma omp parallel for schedule(dynamic)
+for (int i = 0; i< num_agents; i++) {
+  if (agents[i]->factorlookaheadforce > 0) agents[i]->lookaheadforce = agents[i]->lookaheadForce(agents[i]->desiredDirection, agentNeighbors[i]);
+}
+#pragma omp parallel for schedule(dynamic)
+for (int i = 0; i< num_agents; i++) {
+  if (agents[i]->factorsocialforce > 0) agents[i]->socialforce = agents[i]->socialForce(agentNeighbors[i]);
+}
+
+#pragma omp parallel for schedule(static)
+for (int i = 0; i< num_agents; i++) {
+  if (agents[i]->factorobstacleforce > 0) agents[i]->obstacleforce = agents[i]->obstacleForce(agentNeighbors[i]);
+}
+
+#pragma omp parallel for schedule(dynamic)
+for (int i = 0; i< num_agents; i++) {
+  agents[i]->myforce = agents[i]->myForce(agents[i]->desiredDirection, agentNeighbors[i]);
+}
+
+// then move agents according to their forces
+#pragma omp parallel for schedule(static)
+for (int i = 0; i< num_agents; i++) {
+  agents[i]->move(h);
+}
+
+#pragma omp parallel for schedule(dynamic)
+for (auto agent = agents.begin(); agent < agents.end(); agent++) {
+  moveAgent(*agent);
+}
+
+
+
+    // // first update forces
+    // #pragma omp parallel for schedule(dynamic)
+    // for (auto agent = agents.begin(); agent < agents.end(); agent++) {
+    //     (*agent)->computeForces();
+    // }
+    //
+    // // then move agents according to their forces
+    // #pragma omp parallel for schedule(dynamic)
+    // for (auto agent = agents.begin(); agent < agents.end(); agent++) {
+    //     (*agent)->move(h);
+    // }
+    //
+    // #pragma omp parallel for schedule(dynamic)
+    // for (auto agent = agents.begin(); agent < agents.end(); agent++) {
+    //     moveAgent(*agent);
+    // }
 
     // then output their new position if an OutputWriter is given.
 	for (auto ow : outputwriters) {

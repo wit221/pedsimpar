@@ -103,7 +103,6 @@ namespace Ped {
         };
 
 
-    protected:
         int id;                                           ///< agent number
         Tvector p;                                        ///< current position of the agent
         Tvector v;                                        ///< velocity of the agent
@@ -143,6 +142,7 @@ namespace Ped {
 	//        set<const Ped::Tagent*> neighbors;
 
         long timestep;
+      protected:
     };
 }
 #endif
