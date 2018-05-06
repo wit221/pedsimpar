@@ -67,8 +67,8 @@ void Ped::Ttree::clear() {
 /// \date    2012-01-28
 /// \param   *a The agent to add
 void Ped::Ttree::addAgent(const Ped::Tagent *a) {
-  omp_set_nest_lock(const_cast<omp_nest_lock_t*>(&lock));
   #ifdef _OPENMP
+  omp_set_nest_lock(const_cast<omp_nest_lock_t*>(&lock));
   //cerr << a->getid() << " " << omp_get_thread_num() << endl;
   #endif
   if (isleaf) {
@@ -82,7 +82,7 @@ void Ped::Ttree::addAgent(const Ped::Tagent *a) {
     else if ((pos.x >= x+w/2) && (pos.y <= y+h/2)) tree2->addAgent(a); // 2
     else if ((pos.x <= x+w/2) && (pos.y >= y+h/2)) tree4->addAgent(a); // 4
   }
-  
+
   if (agents.size() > 8) {
     isleaf = false;
     addChildren();
@@ -96,7 +96,10 @@ void Ped::Ttree::addAgent(const Ped::Tagent *a) {
       agents.erase(a);
     }
   }
+  #ifdef _OPENMP
+
   omp_unset_nest_lock(const_cast<omp_nest_lock_t*>(&lock));
+  #endif
 }
 
 void Ped::Ttree::addAgentHelper(const Ped::Tagent *a, omp_nest_lock_t *parentlock) {
