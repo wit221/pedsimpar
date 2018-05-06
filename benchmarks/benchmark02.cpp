@@ -30,14 +30,14 @@ int main(int argc, char *argv[]) {
   int num_agents = 20;
   int num_obstacles = 1;
   int num_iter = 10;
-  double h = 0.4;
+  double h = 0.3;
 
   Ped::Twaypoint* waypoints [num_waypoints];
   Ped::Tobstacle* obstacles [num_obstacles];
 
 
   // create scene
-  Ped::Tscene *pedscene = new Ped::Tscene(0, width, 0, height); // no quadtree
+  Ped::Tscene *pedscene = new Ped::Tscene(0, 0, width, height); // no quadtree
 
   //create and add obstacles
   for (int o = 0; o< num_obstacles; o++){
@@ -62,6 +62,8 @@ int main(int argc, char *argv[]) {
     agent->setfactorsocialforce(10.0);
     agent->setfactorobstacleforce(1.0);
     agent->setPosition(random(5, width-5), random(5, height-5), 0);
+    // agent->setPosition(-50 + rand()/(RAND_MAX/80.0)-40, 0 + rand()/(RAND_MAX/20.0)-10, 0);
+
     pedscene->addAgent(agent);
   }
 
@@ -71,9 +73,9 @@ int main(int argc, char *argv[]) {
   }
 
   // cleanup
-  for (auto a : pedscene->getAllAgents()) { delete a; };
-  for (auto w : pedscene->getAllWaypoints()) { delete w; };
-  for (auto o : pedscene->getAllObstacles()) { delete o; };
+  for (auto ag : pedscene->getAllAgents()) { delete ag; };
+  for (auto wa : pedscene->getAllWaypoints()) { delete wa; };
+  for (auto ob : pedscene->getAllObstacles()) { delete ob; };
   delete pedscene;
 
   return EXIT_SUCCESS;
