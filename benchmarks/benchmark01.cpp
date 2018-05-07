@@ -23,7 +23,7 @@ int main(int argc, char *argv[]) {
     Ped::Tobstacle *o = new Ped::Tobstacle(0, -50,  0, +50);
     pedscene->addObstacle(o);
 
-    for (int i = 0; i<5000; i++) {
+    for (int i = 0; i<500; i++) {
         Ped::Tagent *a = new Ped::Tagent();
 
         a->addWaypoint(w1);

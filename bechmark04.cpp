@@ -20,16 +20,16 @@ int random(int min, int max) //range : [min, max)
 
 int main(int argc, char *argv[]) {
 
-  cout << "# Benchmark 02 " << Ped::LIBPEDSIM_VERSION << endl;
+  cout << "# Benchmark 03 " << Ped::LIBPEDSIM_VERSION << endl;
 
   //sim params
   int width = 400;
   int height = 600;
 
-  int num_waypoints = 2;
-  int num_agents = 500;
-  int num_obstacles = 1;
-  int num_iter = 1000;
+  int num_waypoints = 10;
+  int num_agents = 25000;
+  int num_obstacles = 10;
+  int num_iter = 500;
   double h = 0.3;
 
   Ped::Twaypoint* waypoints [num_waypoints];
