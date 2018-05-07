@@ -174,7 +174,7 @@ void Ped::Tscene::moveAgents(double h) {
 
     int N = agents.size();
     // first update forces
-    if (N >= 2000) {
+    if (N >= 2000 && N <= 20000) {
         // bulk update with cuda
         // similar to n-body
         #pragma omp parallel for
