@@ -12,14 +12,13 @@ int random(int min, int max) //range : [min, max)
    static bool first = true;
    if (first)
    {
-      srand( time(NULL) ); //seeding for the first time only!
+      srand(1); //seeding for the first time only!
       first = false;
    }
    return min + rand() % (( max + 1 ) - min);
 }
 
 int main(int argc, char *argv[]) {
-
   cout << "# Benchmark 02 " << Ped::LIBPEDSIM_VERSION << endl;
 
   //sim params
@@ -27,7 +26,7 @@ int main(int argc, char *argv[]) {
   int height = 600;
 
   int num_waypoints = 2;
-  int num_agents = 500;
+  int num_agents = 5000;
   int num_obstacles = 1;
   int num_iter = 1000;
   double h = 0.3;

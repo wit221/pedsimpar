@@ -49,6 +49,7 @@ def bench(args):
     # for every benchmark file:cd
     seq_res = np.array([])
     par_res = np.array([])
+    speedups = np.array([])
 
     for bench_file in bench_files:
         #run and time sequential
@@ -66,9 +67,10 @@ def bench(args):
         cmd = "LD_LIBRARY_PATH=./libpedsimpar/:$LD_LIBRARY_PATH ./bench_cache/{}".format(bench_file.split('.')[0]+'par')
         subprocess.check_output(cmd, shell=True)
         delta = datetime.datetime.now() - tstart
-        secs = delta.seconds + 24    * 3600 * delta.days + 1e-6 * delta.microseconds
+        secs = delta.seconds + 24 * 3600 * delta.days + 1e-6 * delta.microseconds
         out_msg.append("%.2f" % secs)
         par_res = np.append(par_res, secs)
+        speedups = np.append(speedups, seq_res/par_res)
         out_msg.append("%.2f" % (seq_res[-1]/par_res[-1]))
 
         #print results
@@ -78,7 +80,7 @@ def bench(args):
     out_msg = ['Summary: [mean seq, mean par, overll speedup]']
     out_msg.append("%.2f" % np.mean(seq_res))
     out_msg.append("%.2f" % np.mean(par_res))
-    out_msg.append("%.2f" % np.mean(np.sum(seq_res)/np.sum(par_res)))
+    out_msg.append("%.2f" % np.mean(speedups))
     print("\t".join(out_msg))
 
 if __name__ == '__main__':

@@ -22,6 +22,7 @@ using namespace std;
 /// \date    2012-01-17
 Ped::Tscene::Tscene() : tree(NULL), timestep(0) {
     cerr << "no tree" << endl;
+    omp_set_num_threads(2);
 };
 
 
@@ -38,6 +39,7 @@ Ped::Tscene::Tscene() : tree(NULL), timestep(0) {
 Ped::Tscene::Tscene(double left, double top, double width, double height) : Tscene() {
     cerr << "tree: " << left << " " << top << " " << width << " " << height << endl;
     tree = new Ped::Ttree(this, 0, left, top, width, height);
+    omp_set_num_threads(2);
 }
 
 /// Destructor
