@@ -22,7 +22,7 @@ using namespace std;
 /// \date    2012-01-17
 Ped::Tscene::Tscene() : tree(NULL), timestep(0) {
     cerr << "no tree" << endl;
-    omp_set_num_threads(2);
+    omp_set_num_threads(24);
 };
 
 
@@ -39,7 +39,7 @@ Ped::Tscene::Tscene() : tree(NULL), timestep(0) {
 Ped::Tscene::Tscene(double left, double top, double width, double height) : Tscene() {
     cerr << "tree: " << left << " " << top << " " << width << " " << height << endl;
     tree = new Ped::Ttree(this, 0, left, top, width, height);
-    omp_set_num_threads(2);
+    omp_set_num_threads(24);
 }
 
 /// Destructor
@@ -176,34 +176,41 @@ void Ped::Tscene::moveAgents(double h) {
 
 
 int num_agents = agents.size();
-set<const Ped::Tagent*> agentNeighbors [num_agents];
-const double neighborhoodRange = 20.0;
-#pragma omp parallel for schedule(dynamic)
-for(int i = 0; i< num_agents; i++) {
-  agentNeighbors[i] = getNeighbors(agents[i]->p.x, agents[i]->p.y, neighborhoodRange);
-}
-#pragma omp parallel for schedule(static)
-for (int i = 0; i< num_agents; i++) {
-  agents[i]->desiredforce = agents[i]->desiredForce();
-}
-#pragma omp parallel for schedule(dynamic)
-for (int i = 0; i< num_agents; i++) {
-  if (agents[i]->factorlookaheadforce > 0) agents[i]->lookaheadforce = agents[i]->lookaheadForce(agents[i]->desiredDirection, agentNeighbors[i]);
-}
-#pragma omp parallel for schedule(dynamic)
-for (int i = 0; i< num_agents; i++) {
-  if (agents[i]->factorsocialforce > 0) agents[i]->socialforce = agents[i]->socialForce(agentNeighbors[i]);
-}
+// set<const Ped::Tagent*> agentNeighbors [num_agents];
+// const double neighborhoodRange = 20.0;
 
 #pragma omp parallel for schedule(static)
 for (int i = 0; i< num_agents; i++) {
-  if (agents[i]->factorobstacleforce > 0) agents[i]->obstacleforce = agents[i]->obstacleForce(agentNeighbors[i]);
+  agents[i]->computeForces();
 }
 
-#pragma omp parallel for schedule(dynamic)
-for (int i = 0; i< num_agents; i++) {
-  agents[i]->myforce = agents[i]->myForce(agents[i]->desiredDirection, agentNeighbors[i]);
-}
+
+// #pragma omp parallel for schedule(dynamic)
+// for(int i = 0; i< num_agents; i++) {
+//   agentNeighbors[i] = getNeighbors(agents[i]->p.x, agents[i]->p.y, neighborhoodRange);
+// }
+// #pragma omp parallel for schedule(static)
+// for (int i = 0; i< num_agents; i++) {
+//   agents[i]->desiredforce = agents[i]->desiredForce();
+// }
+// #pragma omp parallel for schedule(dynamic)
+// for (int i = 0; i< num_agents; i++) {
+//   if (agents[i]->factorlookaheadforce > 0) agents[i]->lookaheadforce = agents[i]->lookaheadForce(agents[i]->desiredDirection, agentNeighbors[i]);
+// }
+// #pragma omp parallel for schedule(dynamic)
+// for (int i = 0; i< num_agents; i++) {
+//   if (agents[i]->factorsocialforce > 0) agents[i]->socialforce = agents[i]->socialForce(agentNeighbors[i]);
+// }
+//
+// #pragma omp parallel for schedule(static)
+// for (int i = 0; i< num_agents; i++) {
+//   if (agents[i]->factorobstacleforce > 0) agents[i]->obstacleforce = agents[i]->obstacleForce(agentNeighbors[i]);
+// }
+//
+// #pragma omp parallel for schedule(dynamic)
+// for (int i = 0; i< num_agents; i++) {
+//   agents[i]->myforce = agents[i]->myForce(agents[i]->desiredDirection, agentNeighbors[i]);
+// }
 
 // then move agents according to their forces
 #pragma omp parallel for schedule(static)
@@ -211,10 +218,10 @@ for (int i = 0; i< num_agents; i++) {
   agents[i]->move(h);
 }
 
-#pragma omp parallel for schedule(dynamic)
-for (auto agent = agents.begin(); agent < agents.end(); agent++) {
-  moveAgent(*agent);
-}
+// #pragma omp parallel for schedule(dynamic)
+// for (auto agent = agents.begin(); agent < agents.end(); agent++) {
+//   moveAgent(*agent);
+// }
 
 
 

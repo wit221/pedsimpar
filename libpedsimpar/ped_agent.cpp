@@ -567,5 +567,5 @@ void Ped::Tagent::move(double h) {
   if (v.length() > vmax) v = v.normalized() * vmax;
 
   // notice scene of movement
-  // scene->moveAgent(this);
+  scene->moveAgent(this);
 }
