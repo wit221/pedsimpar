@@ -104,7 +104,7 @@ namespace Ped {
         };
 
         void computeForcesCudaDesired();
-        void computeForcesCudaRest(int count);
+        void computeForcesCudaRest(int index, vector<int> &counts, vector<double> &socialx, vector<double> &socialy);
 
     protected:
         int id;                                           ///< agent number

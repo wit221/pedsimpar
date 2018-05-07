@@ -1,5 +1,5 @@
 NVCC = nvcc
-NVCCFLAGS=-O2 -m64 --gpu-architecture compute_35 -shared -Xcompiler -fPIC
+NVCCFLAGS=-O2 -m64 -g --gpu-architecture compute_35 -shared -Xcompiler -fPIC
 CXX = g++
 CXXFLAGS = -g -O2 -fno-inline -std=c++0x -fopenmp -fPIC
 CXXFILES = ped_vector.cpp ped_outputwriter.cpp ped_scene.cpp ped_tree.cpp ped_obstacle.cpp ped_waypoint.cpp ped_agent.cpp

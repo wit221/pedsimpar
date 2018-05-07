@@ -402,6 +402,12 @@ Ped::Tvector Ped::Tagent::socialForce(const set<const Ped::Tagent*> &neighbors) 
 //          }
 //      }
 
+    // DEBUG
+    if (id == 517) {
+        cerr << "reference " << force.x << " " << force.y << endl;
+    }
+    // DEBUG
+
     return force;
 }
 
@@ -514,8 +520,9 @@ void Ped::Tagent::computeForcesCudaDesired() {
     desiredforce = desiredForce(); // TODO when should this be called/updated? this updates desiredDirection as well
 }
 
-void Ped::Tagent::computeForcesCudaRest(int lookaheadcount) {
+void Ped::Tagent::computeForcesCudaRest(int index, vector<int> &counts, vector<double> &socialx, vector<double> &socialy) {
     if (factorlookaheadforce > 0) {
+        int lookaheadcount = counts[index];
         if (lookaheadcount < 0) {
             lookaheadforce.x = 0.5f *  desiredDirection.y;
             lookaheadforce.y = 0.5f * -desiredDirection.x;
@@ -528,8 +535,11 @@ void Ped::Tagent::computeForcesCudaRest(int lookaheadcount) {
         }
     }
     const double neighborhoodRange = 20.0;
+    if (factorsocialforce > 0) {
+        socialforce.x = socialx[index];
+        socialforce.y = socialy[index];
+    }
     auto neighbors = scene->getNeighbors(p.x, p.y, neighborhoodRange);
-    if (factorsocialforce > 0) socialforce = socialForce(neighbors);
     if (factorobstacleforce > 0) obstacleforce = obstacleForce(neighbors);
     myforce = myForce(desiredDirection, neighbors);
 }

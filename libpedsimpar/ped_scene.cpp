@@ -174,18 +174,29 @@ void Ped::Tscene::moveAgents(double h) {
 
     int N = agents.size();
     // first update forces
-    if (tree == NULL) { // && N > 1024) {
+    if (N >= 1000) {
         // bulk update with cuda
         // similar to n-body
-        vector<int> counts(N);
         #pragma omp parallel for
         for (int i = 0; i < agents.size(); i++) {
             agents[i]->computeForcesCudaDesired();
         }
-        cudaLookaheadCount(agents, counts);
+        vector<int> counts(N);
+        vector<double> socialx(N);
+        vector<double> socialy(N);
+        cudaLookaheadSocial(agents, counts, socialx, socialy);
+
+        // DEBUG
+        for (int i = 0; i < agents.size(); i++) {
+            if (agents[i]->getid() == 517) {
+                cerr << "outside " << socialx[i] << " " << socialy[i] << endl;
+            }
+        }
+        // DEBUG
+
         #pragma omp parallel for
         for (int i = 0; i < agents.size(); i++) {
-            agents[i]->computeForcesCudaRest(counts[i]);
+            agents[i]->computeForcesCudaRest(i, counts, socialx, socialy);
         }
     } else {
         #pragma omp parallel for
