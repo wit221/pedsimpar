@@ -22,7 +22,7 @@ int main(int argc, char *argv[]) {
 
   // setup
   Ped::Tscene *pedscene = new Ped::Tscene(); // no quadtree
-    
+
   // add one waypoint (=destination) with a small radius of 10 at the right end.
   Ped::Twaypoint *w1 = new Ped::Twaypoint( 100, 0, 10);
   Ped::Twaypoint *w2 = new Ped::Twaypoint(-100, 0, 10);
@@ -70,7 +70,7 @@ int main(int argc, char *argv[]) {
     do4->setPosition(-40,  5-h, 40,  5-h);
     do5->setPosition(-40,  5-h, -100,  50);
     do6->setPosition( 40,  5-h,  100,  50);
-	
+
     long int timestep = 0;
 
     // reset agents
@@ -89,13 +89,13 @@ int main(int argc, char *argv[]) {
       timestep++;
       notreached = myagents.size();
       pedscene->moveAgents(0.4);
-	  
+
       for (auto a : myagents) {
 	if (a->reachedDestination()) notreached--;
       }
       if (timestep >= 20) notreached = 0; // seems to run forever.
     }
-	
+
     cout << "# " << h << " " << timestep << endl;
 
   }
@@ -105,6 +105,6 @@ int main(int argc, char *argv[]) {
   for (auto w : pedscene->getAllWaypoints()) { delete w; };
   for (auto o : pedscene->getAllObstacles()) { delete o; };
   delete pedscene;
-  
-  return EXIT_SUCCESS;   
+
+  return EXIT_SUCCESS;
 }
