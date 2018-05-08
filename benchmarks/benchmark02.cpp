@@ -7,7 +7,7 @@
 using namespace std;
 
 
-int random(int min, int max) //range : [min, max)
+double random(int min, int max) //range : [min, max)
 {
    static bool first = true;
    if (first)
@@ -15,7 +15,8 @@ int random(int min, int max) //range : [min, max)
       srand(1); //seeding for the first time only!
       first = false;
    }
-   return min + rand() % (( max + 1 ) - min);
+   int range = max - min;
+   return min + ((double)rand()/(double)(RAND_MAX)) * range;
 }
 
 int main(int argc, char *argv[]) {
@@ -28,7 +29,7 @@ int main(int argc, char *argv[]) {
   int num_waypoints = 2;
   int num_agents = 5000;
   int num_obstacles = 1;
-  int num_iter = 1000;
+  int num_iter = 200;
   double h = 0.3;
 
   Ped::Twaypoint* waypoints [num_waypoints];
