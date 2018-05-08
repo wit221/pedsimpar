@@ -497,12 +497,26 @@ Ped::Tvector Ped::Tagent::myForce(Ped::Tvector e, const set<const Ped::Tagent*> 
 /// positions for timestep t are updated at the same time.
 void Ped::Tagent::computeForces() {
     const double neighborhoodRange = 20.0;
+    scene->t.startTimer(scene->GET_NEIGHBORS);
+
     auto neighbors = scene->getNeighbors(p.x, p.y, neighborhoodRange);
+    scene->t.endTimer(scene->GET_NEIGHBORS);
 
     desiredforce = desiredForce();
+
+    scene->t.startTimer(scene->FACTOR_LOOKAHEAD_FORCE);
     if (factorlookaheadforce > 0) lookaheadforce = lookaheadForce(desiredDirection, neighbors);
+    scene->t.endTimer(scene->FACTOR_LOOKAHEAD_FORCE);
+
+    scene->t.startTimer(scene->FACTOR_SOCIAL_FORCE);
     if (factorsocialforce > 0) socialforce = socialForce(neighbors);
+    scene->t.endTimer(scene->FACTOR_SOCIAL_FORCE);
+
+
+    scene->t.startTimer(scene->FACTOR_OBSTACLE_FORCE);
     if (factorobstacleforce > 0) obstacleforce = obstacleForce(neighbors);
+    scene->t.endTimer(scene->FACTOR_OBSTACLE_FORCE);
+
     myforce = myForce(desiredDirection, neighbors);
 }
 
@@ -521,6 +535,7 @@ void Ped::Tagent::move(double h) {
   //    p = p + v * h;
   Tvector p_desired = p + v * h;
 
+  scene->t.startTimer(scene->GET_OBSTACLES);
 
   Ped::Tvector intersection;
   bool has_intersection = false;
@@ -549,6 +564,7 @@ void Ped::Tagent::move(double h) {
       p_desired = intersection - (v*h).normalized()*0.1;
     }
   }
+  scene->t.endTimer(scene->GET_OBSTACLES);
 
   p = p_desired;  // update my position
 

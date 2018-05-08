@@ -176,8 +176,15 @@ Ped::Ttree* Ped::Ttree::getChildByPosition(double xIn, double yIn) {
 /// \date    2012-01-28
 /// \param   *a the agent to update
 void Ped::Ttree::moveAgent(const Ped::Tagent *a) {
+  scene->t.startTimer(scene->GET_AGENT_POS);
+
   omp_set_nest_lock(const_cast<omp_nest_lock_t*>(&lock));
   const Tvector pos = a->getPosition();
+
+  scene->t.endTimer(scene->GET_AGENT_POS);
+
+  scene->t.startTimer(scene->PLACE_AGENT);
+
   if ((pos.x < x) || (pos.x > (x+w)) || (pos.y < y) || (pos.y > (y+h))) {
     agents.erase(a);
     omp_unset_nest_lock(const_cast<omp_nest_lock_t*>(&lock));
@@ -185,6 +192,8 @@ void Ped::Ttree::moveAgent(const Ped::Tagent *a) {
   } else {
     omp_unset_nest_lock(const_cast<omp_nest_lock_t*>(&lock));
   }
+  scene->t.endTimer(scene->PLACE_AGENT);
+
 }
 
 

@@ -7,7 +7,6 @@
 
 #include <cmath>
 #include <vector>
-
 using namespace std;
 
 /// Default constructor, places a wall from 0/0 to 1/1

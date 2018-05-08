@@ -22,7 +22,7 @@ using namespace std;
 /// \date    2012-01-17
 Ped::Tscene::Tscene() : tree(NULL), timestep(0) {
     cerr << "no tree" << endl;
-    omp_set_num_threads(24);
+    omp_set_num_threads(16);
 };
 
 
@@ -37,14 +37,36 @@ Ped::Tscene::Tscene() : tree(NULL), timestep(0) {
 /// \param width is the total width of the boundary. Basically from left to right.
 /// \param height is the total height of the boundary. Basically from top to down.
 Ped::Tscene::Tscene(double left, double top, double width, double height) : Tscene() {
-    cerr << "tree: " << left << " " << top << " " << width << " " << height << endl;
-    tree = new Ped::Ttree(this, 0, left, top, width, height);
-    omp_set_num_threads(24);
+
+  STARTUP = t.addMetric("Startup");
+  CALC_FORCES = t.addMetric("Calculate forces");
+  MAKE_MOVES = t.addMetric("Make moves");
+  CLEAR_SCENE = t.addMetric("Clear scene");
+  FACTOR_LOOKAHEAD_FORCE = t.addMetric("Factor lookahead force", CALC_FORCES);
+  FACTOR_SOCIAL_FORCE = t.addMetric("Factor social force", CALC_FORCES);
+  FACTOR_OBSTACLE_FORCE = t.addMetric("Factor obstacle force", CALC_FORCES);
+  GET_NEIGHBORS = t.addMetric("Getting neighbors", CALC_FORCES);
+
+
+  MOVE_AGENT = t.addMetric("Moving agent", MAKE_MOVES);
+
+  GET_AGENT_POS = t.addMetric("Getting agent positions", MAKE_MOVES);
+
+  PLACE_AGENT = t.addMetric("Placing agents", MAKE_MOVES);
+
+  GET_OBSTACLES = t.addMetric("Getting obstacles", MAKE_MOVES);
+
+  t.startTimer(STARTUP);
+  cerr << "tree: " << left << " " << top << " " << width << " " << height << endl;
+  tree = new Ped::Ttree(this, 0, left, top, width, height);
+  omp_set_num_threads(16);
+  t.endTimer(STARTUP);
 }
 
 /// Destructor
 /// \date    2012-02-04
 Ped::Tscene::~Tscene() {
+    t.summary();
     delete(tree);
 }
 
@@ -178,11 +200,13 @@ void Ped::Tscene::moveAgents(double h) {
 int num_agents = agents.size();
 // set<const Ped::Tagent*> agentNeighbors [num_agents];
 // const double neighborhoodRange = 20.0;
+t.startTimer(CALC_FORCES);
 
 #pragma omp parallel for schedule(static)
 for (int i = 0; i< num_agents; i++) {
   agents[i]->computeForces();
 }
+t.endTimer(CALC_FORCES);
 
 
 // #pragma omp parallel for schedule(dynamic)
@@ -213,10 +237,13 @@ for (int i = 0; i< num_agents; i++) {
 // }
 
 // then move agents according to their forces
+t.startTimer(MAKE_MOVES);
+
 #pragma omp parallel for schedule(static)
 for (int i = 0; i< num_agents; i++) {
   agents[i]->move(h);
 }
+t.endTimer(MAKE_MOVES);
 
 // #pragma omp parallel for schedule(dynamic)
 // for (auto agent = agents.begin(); agent < agents.end(); agent++) {
@@ -263,8 +290,10 @@ void Ped::Tscene::placeAgent(const Ped::Tagent *a) {
 /// \date    2012-01-28
 /// \param   *a the agent to move.
 void Ped::Tscene::moveAgent(const Ped::Tagent *a) {
+  t.startTimer(MOVE_AGENT);
     if (tree != NULL)
         treehash[a]->moveAgent(a);
+  t.endTimer(MOVE_AGENT);
 }
 
 /// This triggers a cleanup of the tree structure. Unused leaf nodes are collected in order to
