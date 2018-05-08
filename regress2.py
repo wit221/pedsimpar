@@ -46,14 +46,14 @@ subprocess.check_call(["make"], cwd="./libpedsim")
 subprocess.check_call(["make"], cwd="./libpedsimpar")
 
 print("[.] making test executables")
-subprocess.check_call("g++ ./regress/regress.cpp -o regress/regress_seq -Ilibpedsim -lpedsim -Llibpedsim -g -std=c++0x", shell=True)
+subprocess.check_call("g++ ./regress/regress2.cpp -o regress/regress_seq -Ilibpedsim -lpedsim -Llibpedsim -g -std=c++0x", shell=True)
 if os.path.exists("/opt/cuda-8.0/"):
     cudalib = "-L/opt/cuda-8.0/lib64/ -lcudart"
     cudalibdir = "/opt/cuda-8.0/lib64/"
 else:
     cudalib = "-L/usr/local/depot/cuda-8.0/lib64/ -lcudart"
     cudalibdir = "/usr/local/depot/cuda-8.0/lib64/"
-subprocess.check_call("g++ ./regress/regress.cpp -o regress/regress_par -Ilibpedsimpar -lpedsimpar -Llibpedsimpar {0} -g -std=c++0x".format(cudalib), shell=True)
+subprocess.check_call("g++ ./regress/regress2.cpp -o regress/regress_par -Ilibpedsimpar -lpedsimpar -Llibpedsimpar {0} -g -std=c++0x".format(cudalib), shell=True)
 
 print("[.] running parallel")
 start = time.time()
